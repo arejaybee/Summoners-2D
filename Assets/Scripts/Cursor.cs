@@ -1,16 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Cursor : MonoBehaviour {
 	private float sizeX;
 	private float sizeY;
+	private Character selectedCharacter;
+	private bool select;//if this is true, we can pick up a unit
 	// Use this for initialization
 	void Start ()
 	{
 		sizeX = transform.localScale.x;
-		print(sizeX);
 		sizeY = transform.localScale.y;
+
+		//we do not start with a character started
+		selectedCharacter = null;
+		select = true;
 	}
 	
 	// Update is called once per frame
@@ -19,6 +25,10 @@ public class Cursor : MonoBehaviour {
 		DetectMovement();
 		MouseMovement();
 		MobileTouchMovement();
+		if(selectedCharacter != null)
+		{
+			selectedCharacter.gameObject.transform.position = transform.position;
+		}
 	}
 
 	//used to move the cursor
@@ -40,6 +50,20 @@ public class Cursor : MonoBehaviour {
 		{
 			transform.position -= new Vector3(sizeX / 1.5f, 0, 0);
 		}
+
+		if(Input.GetKeyDown(KeyCode.Z))
+		{
+			if (select)
+			{
+				DetectSelect();
+				select = false;
+			}
+			else
+			{
+				selectedCharacter = null;
+				select = true;
+			}
+		}
 	}
 
 	/*
@@ -50,6 +74,7 @@ public class Cursor : MonoBehaviour {
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
+			print("Button down");
 			Vector2 mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
 			//clicking gives screen coordinates, so just convert that to world space
@@ -57,6 +82,20 @@ public class Cursor : MonoBehaviour {
 
 			//see next function header for why we do this 
 			transform.position = RoundPosition(clickPos);
+			if (selectedCharacter != null)
+			{
+				selectedCharacter.gameObject.transform.position = transform.position;
+			}
+			if (select)
+			{
+				DetectSelect();
+				select = false;
+			}
+			else
+			{
+				selectedCharacter = null;
+				select = true;
+			}
 		}
 	}
 	
@@ -66,9 +105,38 @@ public class Cursor : MonoBehaviour {
 	 */ 
 	void MobileTouchMovement()
 	{
-		Vector2 fingerPos = Input.GetTouch(0).position;
-		transform.position = RoundPosition(fingerPos);
+		try
+		{
+			Vector2 fingerPos = Input.GetTouch(0).position;
+			transform.position = RoundPosition(fingerPos);
+		}
+		catch(Exception e)
+		{
+			e.ToString();
+			//GetTouch seems to be out of bounds everytime we arent clicking,
+			//This isnt needed, but it makes the false error go away
+		}
 	}
+
+	/*
+	 * This function will see if there is a character to select
+	 * It is implied that when you get to this call you have tried selecting something
+	 * */
+	void DetectSelect()
+	{
+		Character[] chars = FindObjectsOfType<Character>();
+		for(int i = 0; i < chars.Length; i++)
+		{
+			if(RoundPosition(chars[i].gameObject.transform.position) == RoundPosition(transform.position))
+			{
+				print("Char found!");
+				selectedCharacter = chars[i];
+			}
+		}
+	}
+
+
+
 
 
 
