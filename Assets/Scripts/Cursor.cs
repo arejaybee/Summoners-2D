@@ -4,15 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cursor : MonoBehaviour {
-	private float sizeX;
-	private float sizeY;
+	public float size;
 	private Character selectedCharacter;
 	private bool select;//if this is true, we can pick up a unit
 	// Use this for initialization
 	void Start ()
 	{
-		sizeX = transform.localScale.x;
-		sizeY = transform.localScale.y;
+		size = transform.localScale.x; 
 
 		//we do not start with a character started
 		selectedCharacter = null;
@@ -36,19 +34,19 @@ public class Cursor : MonoBehaviour {
 	{
 		if (Input.GetKeyDown(KeyCode.UpArrow))
 		{
-			transform.position += new Vector3(0, sizeY / 1.5f, 0);
+			transform.position += new Vector3(0, size / 1.5f, 0);
 		}
 		if (Input.GetKeyDown(KeyCode.DownArrow))
 		{
-			transform.position -= new Vector3(0, sizeY / 1.5f, 0);
+			transform.position -= new Vector3(0, size / 1.5f, 0);
 		}
 		if (Input.GetKeyDown(KeyCode.RightArrow))
 		{
-			transform.position += new Vector3(sizeX / 1.5f, 0, 0);
+			transform.position += new Vector3(size / 1.5f, 0, 0);
 		}
 		if (Input.GetKeyDown(KeyCode.LeftArrow))
 		{
-			transform.position -= new Vector3(sizeX / 1.5f, 0, 0);
+			transform.position -= new Vector3(size / 1.5f, 0, 0);
 		}
 
 		if(Input.GetKeyDown(KeyCode.Z))
@@ -152,15 +150,15 @@ public class Cursor : MonoBehaviour {
 		//find the first position that is greater than the one clicked
 		while(xPos < Mathf.Abs(pos.x))
 		{
-			xPos += sizeX / 1.5f;
+			xPos += size / 1.5f;
 		}
 		while (yPos < Mathf.Abs(pos.y))
 		{
-			yPos += sizeY / 1.5f;
+			yPos += size / 1.5f;
 		}
 		//look at the last position for both
-		float lxPos = xPos - sizeX / 1.5f;
-		float lyPos = yPos - sizeY / 1.5f;
+		float lxPos = xPos - size / 1.5f;
+		float lyPos = yPos - size / 1.5f;
 
 		//set xPos to the closer position to wherever they clicked
 		if (Mathf.Abs(lxPos - Mathf.Abs(pos.x)) < Mathf.Abs(xPos - Mathf.Abs(pos.x)))
