@@ -72,7 +72,7 @@ public class Cursor : MonoBehaviour {
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
-			print("Button down");
+			//print("Button down");
 			Vector2 mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
 			//clicking gives screen coordinates, so just convert that to world space
@@ -127,7 +127,7 @@ public class Cursor : MonoBehaviour {
 		{
 			if(RoundPosition(chars[i].gameObject.transform.position) == RoundPosition(transform.position))
 			{
-				print("Char found!");
+				//print("Char found!");
 				selectedCharacter = chars[i];
 			}
 		}

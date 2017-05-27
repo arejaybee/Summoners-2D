@@ -7,10 +7,15 @@ public class MapGenerator : MonoBehaviour
 	public string[,] map;
 	private float spacer;
 	private Cursor cursor;
+	private GameObject sum1;
+	private GameObject sum2;
 	// Use this for initialization
 	void Start ()
 	{
 		cursor = FindObjectOfType<Cursor>();
+		sum1 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner1")));
+		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner2")));
+
 		spacer = cursor.size / 1.5f;
 		string tempMap = "MMGGGGGGGG MGGGGGGGGG GGGWWWWGGG GGGGGGGGGM GGGGGGGGMM";
 		string[] n = tempMap.Split(" "[0]);
@@ -22,23 +27,24 @@ public class MapGenerator : MonoBehaviour
 			{
 				if(map[i,j] == "M")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Mountain"));
+					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Mountain"));
 					m.transform.position = new Vector3(spacer* j, spacer * i, 0);
 				}
 				else if (map[i,j] == "G")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Grass"));
+					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Grass"));
 					m.transform.position = new Vector3(spacer * j, spacer * i, 0);
 				}
 				else if (map[i,j] == "W")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Water"));
+					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Water"));
 					m.transform.position = new Vector3(spacer * j, spacer * i, 0);
 				}
 			}
 		}
 		cursor.transform.position = new Vector3(spacer * 5, spacer * 2, 0);
-		
+		sum1.transform.position = new Vector3(0, spacer * (int)(n.Length / 2), 0);
+		sum2.transform.position = new Vector3(spacer * (n[0].Length-1), spacer * (int)(n.Length / 2), 0);
 	}
 	
 	// Update is called once per frame
@@ -54,7 +60,7 @@ public class MapGenerator : MonoBehaviour
 			for(int j = 0; j < n[i].Length; j++)
 			{
 				map[i, j] = n[i].Substring(j, 1);
-				print("I: " + i + " J:" + j);
+				//print("I: " + i + " J:" + j);
 			}
 		}
 	}
