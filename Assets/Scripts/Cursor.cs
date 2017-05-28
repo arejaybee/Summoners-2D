@@ -11,6 +11,7 @@ public class Cursor : MonoBehaviour {
     private float maxY;
 	private float orgX, orgY;
 	private float spacer;
+	MapGenerator map;
 	// Use this for initialization
 	void Start()
 	{
@@ -20,7 +21,7 @@ public class Cursor : MonoBehaviour {
 		selectedCharacter = null;
 		select = true;
 
-		MapGenerator map = FindObjectOfType<MapGenerator>();
+		map = FindObjectOfType<MapGenerator>();
 		maxX = spacer * (map.boundsX - 1);
 		maxY = spacer * (map.boundsY - 1);
 	}
@@ -85,6 +86,7 @@ public class Cursor : MonoBehaviour {
 			}
 			else
 			{
+				selectedCharacter.canMove = false;
 				selectedCharacter = null;
 				select = true;
 				//remove the move tiles
@@ -120,6 +122,7 @@ public class Cursor : MonoBehaviour {
 			}
 			else
 			{
+				selectedCharacter.canMove = false;
 				selectedCharacter = null;
 				select = true;
 				RemoveMoveTiles();
@@ -158,12 +161,15 @@ public class Cursor : MonoBehaviour {
 			if(RoundPosition(chars[i].gameObject.transform.position) == RoundPosition(transform.position))
 			{
 				//print("Char found!");
-				selectedCharacter = chars[i];
-				select = false;
+				if (chars[i].canMove)
+				{
+					selectedCharacter = chars[i];
+					select = false;
+				}
 			}
 		}
 
-		if (!select)
+		if (!select) 
 		{
 			//if you select a character, put down move tiles
 			//put down the places this char can move
@@ -173,21 +179,10 @@ public class Cursor : MonoBehaviour {
 
 			int oX = realRound(orgX);
 			int oY = realRound(orgY);
+			//print("Character is at: " + oX + " , " + oY);
 
 			//displays all of the possible spaces that character can move to
-			for (int k = (int)(0 - selectedCharacter.move); k <= selectedCharacter.move; k++)
-			{
-				for (int j = (int)(0 - selectedCharacter.move); j <= selectedCharacter.move; j++)
-				{
-					//only put them on the map
-					if (oX + k >= 0 && oX + k <= realRound(maxX / spacer) && oY + j <= realRound(maxY / spacer) && oY + j >= 0)
-					{
-						GameObject newPiece = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
-						newPiece.transform.position = new Vector3(spacer * (orgX + k), spacer * (orgY + j), 0);
-						
-					}
-				}
-			}
+			MakeMoveTile(selectedCharacter.move+1, oX, oY,selectedCharacter);
 		}
 	}
 
@@ -303,5 +298,75 @@ public class Cursor : MonoBehaviour {
 			return (int)f + 1;
 		}
 		return (int)f;
+	}
+
+	//recursively makes the tiles that show a user where they can move
+	void MakeMoveTile(int move, int x, int y, Character charToMove)
+	{
+		//if move is < 0 we are done here.
+		//also just check if you're out of bounds
+		if (move < 0)
+		{
+			return;
+		}
+
+		//if there is a character here, you're done.
+		Character[] chars = FindObjectsOfType<Character>();
+		for(int i = 0; i < chars.Length; i++)
+		{
+			if (chars[i] != charToMove)
+			{
+				if (realRound(chars[i].transform.position.x / spacer) == x && realRound(chars[i].transform.position.y / spacer) == y)
+				{
+					return;
+				}
+			}
+		}
+
+		//don't overlap movetiles
+		GameObject[] gobj = GameObject.FindGameObjectsWithTag("MoveTile");
+		for(int i = 0; i < gobj.Length; i++)
+		{
+			if(realRound(gobj[i].transform.position.x) == x && realRound(gobj[i].transform.position.y) == y)
+			{
+				return;
+			}
+		}
+
+		//find the tile at that position
+		GameObject[] mt = GameObject.FindGameObjectsWithTag("MapTile");
+		int index =-1;
+		for(int i = 0; i < mt.Length; i++)
+		{
+			if(realRound(mt[i].transform.position.x/spacer) == x && realRound(mt[i].transform.position.y/spacer) == y)
+			{
+				index = i;
+			}
+		}
+		//just error checking here
+		if(index == -1)
+		{
+			print("Index was -1 while at: " + x + " , " + y);
+		}
+		int cost = mt[index].GetComponent<MapTile>().moveCost;
+
+		//if the player cannot move now, just stop
+		if(move - cost < 0)
+		{
+			return;
+		}
+		//move up,left,right,down
+		if(y+1 <= realRound(maxY/spacer))
+			MakeMoveTile(move - cost, x, y + 1,charToMove);
+		if(x-1 >= 0)
+			MakeMoveTile(move - cost, x - 1, y,charToMove);
+		if(x+1 <= realRound(maxX/spacer))
+			MakeMoveTile(move - cost, x + 1, y,charToMove);
+		if(y-1 >= 0)
+			MakeMoveTile(move - cost, x, y - 1,charToMove);
+		
+		//on the way back, make a thing here
+		GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
+		obj.transform.position = new Vector3(x*spacer, y*spacer);
 	}
 }

@@ -13,7 +13,7 @@ public class Character : MonoBehaviour
     public float attkRange;
     public float attk;
     public float defense;
-    public float move;
+    public int move;
     public float playerNumber;
     public new string name;
     public string description;

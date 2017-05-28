@@ -5,7 +5,7 @@ using UnityEngine;
 public class MapTile : MonoBehaviour
 {
 	public int moveCost;
-
+	public string theName;
 	// Use this for initialization
 	void Start ()
 	{

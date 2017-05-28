@@ -5,6 +5,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
 	public string[,] map;
+	public MapTile[,] mapTiles;
 	public int boundsX;
 	public int boundsY;
 	private float spacer;
@@ -36,6 +37,7 @@ public class MapGenerator : MonoBehaviour
 	void MakeMap(string[] n)
 	{
 		map = new string[n.Length, n[0].Length];
+		mapTiles = new MapTile[n.Length, n[0].Length];
 		for(int i = 0; i < n.Length; i++)
 		{
 			for(int j = 0; j < n[i].Length; j++)
@@ -51,21 +53,23 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (int j = 0; j < n[0].Length; j++)
 			{
+				GameObject m = null;
 				if (map[i, j] == "M")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Mountain"));
+					m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Mountain"));
 					m.transform.position = new Vector3(spacer * j, spacer * i, 0);
 				}
 				else if (map[i, j] == "G")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Grass"));
+					 m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Grass"));
 					m.transform.position = new Vector3(spacer * j, spacer * i, 0);
 				}
 				else if (map[i, j] == "W")
 				{
-					GameObject m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Water"));
+					 m = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/Water"));
 					m.transform.position = new Vector3(spacer * j, spacer * i, 0);
 				}
+				mapTiles[i, j] = m.GetComponent<MapTile>();
 			}
 		}
 		cursor.transform.position = new Vector3(spacer * 5, spacer * 2, 0);
