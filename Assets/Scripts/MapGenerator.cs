@@ -72,8 +72,8 @@ public class MapGenerator : MonoBehaviour
 				mapTiles[i, j] = m.GetComponent<MapTile>();
 			}
 		}
-		cursor.transform.position = new Vector3(spacer * 5, spacer * 2, 0);
+		cursor.transform.position = new Vector3(spacer * (int)(n[0].Length/2), spacer * (int)(n.Length/2), 0);
 		sum1.transform.position = new Vector3(0, spacer * (int)(n.Length / 2), 0);
-		sum2.transform.position = new Vector3(spacer * (n[0].Length - 1), spacer * (int)(n.Length / 2), 0);
+		sum2.transform.position = new Vector3(spacer * (int)(n[0].Length - 1), spacer * (int)(n.Length / 2), 0);
 	}
 }

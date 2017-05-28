@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class Cursor : MonoBehaviour {
 	public float size;
-	private Character selectedCharacter;
+	public float maxX;
+	public float maxY;
+	public float spacer;
 	private bool select;//if this is true, we can pick up a unit
-	private float maxX;
-    private float maxY;
+	private Character selectedCharacter;
 	private float orgX, orgY;
-	private float spacer;
 	MapGenerator map;
 	// Use this for initialization
 	void Start()
@@ -92,6 +92,17 @@ public class Cursor : MonoBehaviour {
 				//remove the move tiles
 				RemoveMoveTiles();
 			}
+		}
+		if(Input.GetKeyDown(KeyCode.X))
+		{
+			if (!select)
+			{
+				selectedCharacter.transform.position = new Vector3(orgX, orgY, 0);
+			}
+			selectedCharacter = null;
+			select = true;
+			//remove the move tiles
+			RemoveMoveTiles();
 		}
 	}
 
@@ -211,6 +222,7 @@ public class Cursor : MonoBehaviour {
 		transform.position = new Vector3(tempX, tempY, 0);
 	}
 
+	//limit the cursor to only move over movement tiles
 	bool LimitToMoveTiles()
 	{
 		bool returnable = false;
