@@ -17,14 +17,14 @@ Platform assembly: D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Manage
 Loading D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
 Platform assembly: D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll (this message is harmless)
 Loading D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll into Unity Child Domain
-- Completed reload, in  0.022 seconds
+- Completed reload, in  0.090 seconds
 Platform assembly: D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: D:\Users\Robert Bradshaw\Documents\Summoners-2D\l_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 1.950815 ms
+UnloadTime: 1.941334 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 31dc -> priority: 1 
-  Thread -> id: 19d8 -> priority: 1 
+  Thread -> id: 18e4 -> priority: 1 
+  Thread -> id: 315c -> priority: 1 

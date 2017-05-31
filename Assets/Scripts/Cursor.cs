@@ -11,7 +11,9 @@ public class Cursor : MonoBehaviour {
 	private bool select;//if this is true, we can pick up a unit
 	private Character selectedCharacter;
 	private float orgX, orgY;
+	private float charOrgX, charOrgY;
 	MapGenerator map;
+	Turns turn;
 	// Use this for initialization
 	void Start()
 	{
@@ -22,6 +24,7 @@ public class Cursor : MonoBehaviour {
 		select = true;
 
 		map = FindObjectOfType<MapGenerator>();
+		turn = FindObjectOfType<Turns>();
 		maxX = spacer * (map.boundsX - 1);
 		maxY = spacer * (map.boundsY - 1);
 	}
@@ -30,11 +33,6 @@ public class Cursor : MonoBehaviour {
 	{
 		orgX = transform.position.x;
 		orgY = transform.position.y;
-		if(!select)
-		{
-			orgX = selectedCharacter.transform.position.x;
-			orgY = selectedCharacter.transform.position.y;
-		}
 		DetectMovement();
 		//MouseMovement();
 		//MobileTouchMovement();
@@ -97,7 +95,7 @@ public class Cursor : MonoBehaviour {
 		{
 			if (!select)
 			{
-				selectedCharacter.transform.position = new Vector3(orgX, orgY, 0);
+				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
 			}
 			selectedCharacter = null;
 			select = true;
@@ -171,11 +169,17 @@ public class Cursor : MonoBehaviour {
 		{
 			if(RoundPosition(chars[i].gameObject.transform.position) == RoundPosition(transform.position))
 			{
-				//print("Char found!");
-				if (chars[i].canMove)
+				if (chars[i].playerNumber == turn.playerTurn)
 				{
-					selectedCharacter = chars[i];
-					select = false;
+					//print("Char found!");
+					if (chars[i].canMove)
+					{
+						selectedCharacter = chars[i];
+						select = false;
+						charOrgX = selectedCharacter.transform.position.x;
+						charOrgY = selectedCharacter.transform.position.y;
+
+					}
 				}
 			}
 		}
