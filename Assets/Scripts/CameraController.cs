@@ -17,9 +17,9 @@ public class CameraController : MonoBehaviour {
 	void Update ()
 	{
 		maxX = realRound(cursor.maxX / cursor.spacer) - 10;
-		maxY = realRound(cursor.maxY / cursor.spacer) - 5;
+		maxY = realRound(cursor.maxY / cursor.spacer) - 3;
 		minX = 0+10;
-		minY = 0 + 5;
+		minY = 0 + 3;
 		float tempX = cursor.transform.position.x;
 		float tempY = cursor.transform.position.y;
 		if(realRound(tempX / cursor.spacer) > maxX)

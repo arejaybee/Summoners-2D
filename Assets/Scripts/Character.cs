@@ -24,25 +24,36 @@ public class Character : MonoBehaviour
     public string extraDescription = "";
 	protected bool piercing;
 	public bool counterAttack;
+	public int speech;
+	public int loyalty;
+
+	//literally just to size/space based on cursor size
+	public Cursor cursor;
+	private float spacer;
 	// Use this for initialization
-	void Start ()
+	protected virtual void Start ()
     {
         if(maxHp == 0)
         {
             maxHp = 1;
             hp = 1;
         }
+		speech = 0;
+		loyalty = 0;
         hp = maxHp;
         description = name + "\n HP: " + hp + "/" + maxHp + "\n Attk: " + attk + " Def: " + defense + "\n Attk Range: " + attkRange + "\n Move: "+move+extraDescription;
         canMove = true;
 		counterAttack = false;
 		piercing = false;
+		cursor = FindObjectOfType<Cursor>();
+		spacer = cursor.spacer;
     }
 
     // Update is called once per frame
     protected virtual void Update ()
     {
-        if (hp <= 0f)
+		
+		if (hp <= 0f)
         {
             Destroy(this.gameObject);
         }
@@ -146,4 +157,23 @@ public class Character : MonoBehaviour
     {
         //this is for units with abilities
     }
+	public int getIntX()
+	{
+		return realRound(transform.position.x / spacer);
+	}
+	public int getIntY()
+	{
+		return realRound(transform.position.y / spacer);
+	}
+	int realRound(float f)
+	{
+		float tempF = f;
+		tempF -= (int)f;
+		tempF *= 10;
+		if ((int)tempF > 4)
+		{
+			return (int)f + 1;
+		}
+		return (int)f;
+	}
 }

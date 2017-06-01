@@ -385,4 +385,12 @@ public class Cursor : MonoBehaviour {
 		GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
 		obj.transform.position = new Vector3(x*spacer, y*spacer);
 	}
+	public int getIntX()
+	{
+		return realRound(transform.position.x/spacer);
+	}
+	public int getIntY()
+	{
+		return realRound(transform.position.y / spacer);
+	}
 }

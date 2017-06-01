@@ -8,11 +8,12 @@ public class Summoner : Character {
 	public int summonRange;
 	public int mana;
 	// Use this for initialization
-	void Start ()
+	protected override void Start ()
 	{
+		base.Start();
 		name = "Summoner";
 		maxHp = 25;
-		hp = 25;
+		hp = maxHp;
 		move = 2;
 		attkRange = 3;
 		summonRange = 1;
@@ -23,6 +24,7 @@ public class Summoner : Character {
 		armySize = 10;
 		numUnits = 0;
 		mana = 5;
+		extraDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
 	protected override void Update()
 	{
