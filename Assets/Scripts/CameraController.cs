@@ -16,13 +16,19 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+		
+		
+	}
+
+	public void moveCamera(Vector3 pos)
+	{
 		maxX = realRound(cursor.maxX / cursor.spacer) - 10;
 		maxY = realRound(cursor.maxY / cursor.spacer) - 3;
-		minX = 0+10;
+		minX = 0 + 10;
 		minY = 0 + 3;
-		float tempX = cursor.transform.position.x;
-		float tempY = cursor.transform.position.y;
-		if(realRound(tempX / cursor.spacer) > maxX)
+		float tempX = pos.x;
+		float tempY = pos.y;
+		if (realRound(tempX / cursor.spacer) > maxX)
 		{
 			tempX = maxX * cursor.spacer;
 		}
@@ -35,14 +41,13 @@ public class CameraController : MonoBehaviour {
 		{
 			tempY = maxY * cursor.spacer;
 		}
-		else if(realRound(tempY / cursor.spacer) < minY)
+		else if (realRound(tempY / cursor.spacer) < minY)
 		{
 			tempY = minY * cursor.spacer;
 		}
-		
 		transform.position = new Vector3(tempX, tempY, transform.position.z);
-	}
 
+	}
 	int realRound(float f)
 	{
 		float tempF = f;

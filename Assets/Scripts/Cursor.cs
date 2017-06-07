@@ -8,32 +8,37 @@ public class Cursor : MonoBehaviour {
 	public float maxX;
 	public float maxY;
 	public float spacer;
+	public bool cursorCanMove;
 	private bool select;//if this is true, we can pick up a unit
 	private Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
-	MapGenerator map;
+	HUB hub;
 	Turns turn;
+
 	// Use this for initialization
 	void Start()
 	{
+		hub = GameObject.FindObjectOfType<HUB>();
 		size = transform.localScale.x;
 		spacer = size / 1.5f;
 		//we do not start with a character started
 		selectedCharacter = null;
 		select = true;
-
-		map = FindObjectOfType<MapGenerator>();
+		cursorCanMove = true;
 		turn = FindObjectOfType<Turns>();
-		maxX = spacer * (map.boundsX - 1);
-		maxY = spacer * (map.boundsY - 1);
+		maxX = spacer * (hub.mapGenerator.boundsX - 1);
+		maxY = spacer * (hub.mapGenerator.boundsY - 1);
 	}
 	// Update is called once per frame
 	void Update ()
 	{
 		orgX = transform.position.x;
 		orgY = transform.position.y;
-		DetectMovement();
+		if (cursorCanMove)
+		{
+			DetectMovement();
+		}
 		//MouseMovement();
 		//MobileTouchMovement();
 		if (select)
@@ -59,40 +64,45 @@ public class Cursor : MonoBehaviour {
 	//used to move the cursor
 	void DetectMovement()
 	{
-		if (Input.GetKeyDown(KeyCode.UpArrow))
+		Vector3 mv= new Vector3(0,0,0);
+		//Each key only gives input every tenth of a second. This keeps the cursor
+		//moving smoothley
+		if (Input.GetKey(KeyCode.UpArrow) && Time.time - hub.lastTimeUp >= 0.1f)
 		{
-			transform.position += new Vector3(0, spacer, 0);
+			hub.lastTimeUp = Time.time;
+			mv = new Vector3(0, spacer, 0);
 		}
-		if (Input.GetKeyDown(KeyCode.DownArrow))
+		if (Input.GetKey(KeyCode.DownArrow) && Time.time - hub.lastTimeDown >= 0.1f)
 		{
-			transform.position -= new Vector3(0, spacer, 0);
+			hub.lastTimeDown = Time.time;
+			mv = new Vector3(0, -1*spacer, 0);
 		}
-		if (Input.GetKeyDown(KeyCode.RightArrow))
+		if (Input.GetKey(KeyCode.RightArrow) && Time.time - hub.lastTimeRight >= 0.1f)
 		{
-			transform.position += new Vector3(spacer, 0, 0);
+			hub.lastTimeRight = Time.time;
+			mv = new Vector3(spacer, 0, 0);
 		}
-		if (Input.GetKeyDown(KeyCode.LeftArrow))
+		if (Input.GetKey(KeyCode.LeftArrow) && Time.time - hub.lastTimeLeft >= 0.1f)
 		{
-			transform.position -= new Vector3(spacer, 0, 0);
+			hub.lastTimeLeft = Time.time;
+			mv = new Vector3(-1*spacer, 0, 0);
 		}
 
-		if(Input.GetKeyDown(KeyCode.Z))
+		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.5f)
 		{
+			hub.lastTimeZ = Time.time;
 			if (select)
 			{
 				DetectSelect();
 			}
 			else
 			{
-				selectedCharacter.canMove = false;
-				selectedCharacter = null;
-				select = true;
-				//remove the move tiles
-				RemoveMoveTiles();
+				GoToMoveMenu();
 			}
 		}
-		if(Input.GetKeyDown(KeyCode.X))
+		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f)
 		{
+			hub.lastTimeX = Time.time;
 			if (!select)
 			{
 				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
@@ -102,62 +112,36 @@ public class Cursor : MonoBehaviour {
 			//remove the move tiles
 			RemoveMoveTiles();
 		}
+
+		hub.cam.moveCamera(transform.position+mv);
+		transform.position += mv;
 	}
 
-	/*
-	 * Detects a click of the mouse
-	 * Sends the cursor to the square closest to wherever was clicked
-	 */ 
-	void MouseMovement()
+	//Enters the MoveMenu script.
+	//Gives players options after they have moved
+	void GoToMoveMenu()
 	{
-		if (Input.GetMouseButtonDown(0))
+		ArrayList list = new ArrayList();
+		if(selectedCharacter.name.Contains("Summoner"))
 		{
-			//print("Button down");
-			Vector2 mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
-			//clicking gives screen coordinates, so just convert that to world space
-			Vector3 clickPos = Camera.main.ScreenToWorldPoint(mousePosition);
-
-			//see next function header for why we do this 
-			transform.position = RoundPosition(clickPos);
-			if (selectedCharacter != null)
-			{
-				selectedCharacter.gameObject.transform.position = transform.position;
-			}
-			if (select)
-			{
-				DetectSelect();
-				select = false;
-			}
-			else
-			{
-				selectedCharacter.canMove = false;
-				selectedCharacter = null;
-				select = true;
-				RemoveMoveTiles();
-			}
+			list.Add("Summon");
 		}
+		list.Add("Stop");
+		cursorCanMove = false;
+		Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
+		hub.moveMenuHandler.MakeMoveMenu(list, pos);
 	}
-	
-	/*
-	 * Just incase this game DOES get adapted to mobile, 
-	 * This should mimic the mouse movement function, but with a touch request
-	 */ 
-	void MobileTouchMovement()
+
+	//this is set up to be called from the moveMenu so that this stuff is only set IF they confirm.
+	//on cancel we just move around again
+	public void confirmFromMoveMenu()
 	{
-		try
-		{
-			Vector2 fingerPos = Input.GetTouch(0).position;
-			transform.position = RoundPosition(fingerPos);
-		}
-		catch(Exception e)
-		{
-			e.ToString();
-			//GetTouch seems to be out of bounds everytime we arent clicking,
-			//This isnt needed, but it makes the false error go away
-		}
+		selectedCharacter.canMove = false;
+		selectedCharacter = null;
+		select = true;
+		//remove the move tiles
+		RemoveMoveTiles();
 	}
-
 	/*
 	 * This function will see if there is a character to select
 	 * It is implied that when you get to this call you have tried selecting something
@@ -197,7 +181,7 @@ public class Cursor : MonoBehaviour {
 			//print("Character is at: " + oX + " , " + oY);
 
 			//displays all of the possible spaces that character can move to
-			MakeMoveTile(selectedCharacter.move+1, oX, oY,selectedCharacter);
+			MakeMoveTile(selectedCharacter.move+1, oX, oY,selectedCharacter,false);
 		}
 	}
 
@@ -317,27 +301,8 @@ public class Cursor : MonoBehaviour {
 	}
 
 	//recursively makes the tiles that show a user where they can move
-	void MakeMoveTile(int move, int x, int y, Character charToMove)
+	void MakeMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
 	{
-		//if move is < 0 we are done here.
-		//also just check if you're out of bounds
-		if (move < 0)
-		{
-			return;
-		}
-
-		//if there is a character here, you're done.
-		Character[] chars = FindObjectsOfType<Character>();
-		for(int i = 0; i < chars.Length; i++)
-		{
-			if (chars[i] != charToMove)
-			{
-				if (realRound(chars[i].transform.position.x / spacer) == x && realRound(chars[i].transform.position.y / spacer) == y)
-				{
-					return;
-				}
-			}
-		}
 
 		//don't overlap movetiles
 		GameObject[] gobj = GameObject.FindGameObjectsWithTag("MoveTile");
@@ -364,22 +329,30 @@ public class Cursor : MonoBehaviour {
 		{
 			print("Index was -1 while at: " + x + " , " + y);
 		}
-		int cost = mt[index].GetComponent<MapTile>().moveCost;
 
+		int cost;
+		if (hasMoved)
+		{
+			cost = mt[index].GetComponent<MapTile>().moveCost;
+		}
+		else
+		{
+			cost = 0;
+		}
 		//if the player cannot move now, just stop
-		if(move - cost < 0)
+		if(move - cost <= 0)
 		{
 			return;
 		}
 		//move up,left,right,down
 		if(y+1 <= realRound(maxY/spacer))
-			MakeMoveTile(move - cost, x, y + 1,charToMove);
+			MakeMoveTile(move - cost, x, y + 1,charToMove, true);
 		if(x-1 >= 0)
-			MakeMoveTile(move - cost, x - 1, y,charToMove);
+			MakeMoveTile(move - cost, x - 1, y,charToMove,true);
 		if(x+1 <= realRound(maxX/spacer))
-			MakeMoveTile(move - cost, x + 1, y,charToMove);
+			MakeMoveTile(move - cost, x + 1, y,charToMove,true);
 		if(y-1 >= 0)
-			MakeMoveTile(move - cost, x, y - 1,charToMove);
+			MakeMoveTile(move - cost, x, y - 1,charToMove,true);
 		
 		//on the way back, make a thing here
 		GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));

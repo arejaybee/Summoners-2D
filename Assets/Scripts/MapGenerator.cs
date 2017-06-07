@@ -9,17 +9,17 @@ public class MapGenerator : MonoBehaviour
 	public int boundsX;
 	public int boundsY;
 	private float spacer;
-	private Cursor cursor;
+	private HUB hub;
 	private GameObject sum1;
 	private GameObject sum2;
 	// Use this for initialization
 	void Start ()
 	{
-		cursor = FindObjectOfType<Cursor>();
+		hub = GameObject.FindObjectOfType<HUB>();
 		sum1 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner1")));
 		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner2")));
 
-		spacer = cursor.size / 1.5f;
+		spacer = hub.cursor.size / 1.5f;
 		string tempMap = "MMMGGGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMMMGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGWWGGGGGGGGGGGG GGGGGGGGWWGGGGGGGGGGG GGGGGGGGGWWGGGGGGGGGG GGGGGGGGGGWWWWGGGGGGG GGGGGGGGGWWWWWGGGGGGG GGGGGGGGGGGGGWGGGGGGG GGGGGGGGGGGGGGWGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG";
 		string[] n = tempMap.Split(" "[0]);
 		boundsY = n.Length;
@@ -72,7 +72,7 @@ public class MapGenerator : MonoBehaviour
 				mapTiles[i, j] = m.GetComponent<MapTile>();
 			}
 		}
-		cursor.transform.position = new Vector3(spacer * (int)(n[0].Length/2), spacer * (int)(n.Length/2), 0);
+		hub.cursor.transform.position = new Vector3(spacer * (int)(n[0].Length/2), spacer * (int)(n.Length/2), 0);
 		sum1.transform.position = new Vector3(0, spacer * (int)(n.Length / 2), 0);
 		sum2.transform.position = new Vector3(spacer * (int)(n[0].Length - 1), spacer * (int)(n.Length / 2), 0);
 	}

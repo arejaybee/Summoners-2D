@@ -14,7 +14,7 @@ public class Summoner : Character {
 		name = "Summoner";
 		maxHp = 25;
 		hp = maxHp;
-		move = 2;
+		move = 3;
 		attkRange = 3;
 		summonRange = 1;
 		attk = 5;

@@ -19,12 +19,15 @@ public class TopBar : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+		//see if the cursor is on a character
 		chars = FindObjectsOfType<Character>();
 		if (isCursorOnCharacter())
 		{
+			//if so there is a bar, and it needs info
 			topBar.SetActive(true);
 			FillTopInfo();
 		}
+		//there is no bar otherwise
 		else
 		{
 			topBar.SetActive(false);
@@ -53,13 +56,13 @@ public class TopBar : MonoBehaviour
 		GameObject stats = topBar.transform.FindChild("Stats").gameObject;
 		GameObject playerNum = topBar.transform.FindChild("PlayerNum").gameObject;
 		GameObject description = topBar.transform.FindChild("Description").gameObject;
-
+		topBar.GetComponent<SpriteRenderer>().color = selectedChar.getPlayerColor();
 		//set HP
 		hp.GetComponent<TextMesh>().text = "HP: " + selectedChar.hp.ToString() + "/" + selectedChar.maxHp.ToString();
 		//name
 		name.GetComponent<TextMesh>().text = selectedChar.name;
 		//stats
-		stats.GetComponent<TextMesh>().text = "   ATK: "+selectedChar.attk + "\tRNG: " + selectedChar.attkRange + "\n   DEF: " + selectedChar.defense + "\tMOV: " + selectedChar.move+"\nSPCH: "+selectedChar.speech+"\t LOY: "+selectedChar.loyalty;
+		stats.GetComponent<TextMesh>().text = "   ATK: "+selectedChar.attk + "\tRNG: " + selectedChar.attkRange + "\n   DEF: " + selectedChar.defense + "\tMOV: " + selectedChar.move+"\nSPCH: "+selectedChar.speech+"\tLOY : "+selectedChar.loyalty;
 		//playerNumber
 		playerNum.GetComponent<TextMesh>().text = "Player " + selectedChar.playerNumber;
 		//description

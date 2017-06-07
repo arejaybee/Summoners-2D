@@ -176,4 +176,16 @@ public class Character : MonoBehaviour
 		}
 		return (int)f;
 	}
+	public Color getPlayerColor()
+	{
+		if(playerNumber == 1)
+		{
+			return Color.red;
+		}
+		else if(playerNumber == 2)
+		{
+			return Color.blue;
+		}
+		return Color.white;
+	}
 }
