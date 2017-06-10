@@ -13,8 +13,13 @@ public class Cursor : MonoBehaviour {
 	private Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
+	private Character unselectableSummoner;
+	private ArrayList mapTiles;
+	private ArrayList mapTilePos;
 	HUB hub;
 	Turns turn;
+	private bool mapFlag;
+	private ArrayList moveTilePositions;
 
 	// Use this for initialization
 	void Start()
@@ -29,6 +34,16 @@ public class Cursor : MonoBehaviour {
 		turn = FindObjectOfType<Turns>();
 		maxX = spacer * (hub.mapGenerator.boundsX - 1);
 		maxY = spacer * (hub.mapGenerator.boundsY - 1);
+		mapFlag = true;
+		mapTiles = new ArrayList();
+		mapTilePos = new ArrayList();
+		GameObject[] mt = GameObject.FindGameObjectsWithTag("MapTile");
+		for (int i = 0; i < mt.Length; i++)
+		{
+			mapTiles.Add(mt[i]);
+			mapTilePos.Add(new Vector2(realRound(mt[i].transform.position.x / spacer), realRound(mt[i].transform.position.y/spacer)));
+		}
+		moveTilePositions = new ArrayList();
 	}
 	// Update is called once per frame
 	void Update ()
@@ -91,10 +106,12 @@ public class Cursor : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.5f)
 		{
 			hub.lastTimeZ = Time.time;
+			//if you have not selected a character, do so
 			if (select)
 			{
 				DetectSelect();
 			}
+			//if you have a character selected, give them options from this point
 			else
 			{
 				GoToMoveMenu();
@@ -148,26 +165,25 @@ public class Cursor : MonoBehaviour {
 	 * */
 	void DetectSelect()
 	{
-		Character[] chars = FindObjectsOfType<Character>();
-		for(int i = 0; i < chars.Length; i++)
+		Character c = (Character)hub.characters[hub.characterPositions.IndexOf(RoundPosition(transform.position))];
+		if (c.playerNumber == turn.playerTurn)
 		{
-			if(RoundPosition(chars[i].gameObject.transform.position) == RoundPosition(transform.position))
+			if (c.canMove)
 			{
-				if (chars[i].playerNumber == turn.playerTurn)
-				{
-					//print("Char found!");
-					if (chars[i].canMove)
-					{
-						selectedCharacter = chars[i];
-						select = false;
-						charOrgX = selectedCharacter.transform.position.x;
-						charOrgY = selectedCharacter.transform.position.y;
-
-					}
-				}
+				selectedCharacter = c;
+				select = false;
+				charOrgX = selectedCharacter.transform.position.x;
+				charOrgY = selectedCharacter.transform.position.y;
+			}
+			else if (c.name == "Summoner")
+			{
+				cursorCanMove = false;
+				ArrayList list = new ArrayList();
+				list.Add("Summon");
+				Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
+				hub.moveMenuHandler.MakeMoveMenu(list, pos);
 			}
 		}
-
 		if (!select) 
 		{
 			//if you select a character, put down move tiles
@@ -181,7 +197,8 @@ public class Cursor : MonoBehaviour {
 			//print("Character is at: " + oX + " , " + oY);
 
 			//displays all of the possible spaces that character can move to
-			MakeMoveTile(selectedCharacter.move+1, oX, oY,selectedCharacter,false);
+			FindMoveTile(selectedCharacter.move, oX, oY,selectedCharacter,false);
+			MakeMoveTiles();
 		}
 	}
 
@@ -236,10 +253,11 @@ public class Cursor : MonoBehaviour {
 	 * When clicking to move, the position doesnt necessarily stay grid like
 	 * This function converts a clicked location into a grid location.
 	 */
-	Vector3 RoundPosition(Vector3 pos)
+	public Vector3 RoundPosition(Vector3 pos)
 	{
 		float xPos = 0;
 		float yPos = 0;
+
 		//find the first position that is greater than the one clicked
 		while(xPos < Mathf.Abs(pos.x))
 		{
@@ -286,8 +304,13 @@ public class Cursor : MonoBehaviour {
 		{
 			GameObject.Destroy(moveTiles[i]);
 		}
+		moveTilePositions.Clear();
 	}
-
+	
+	Vector2 realRound(Vector2 f)
+	{
+		return new Vector2(realRound(f.x), realRound(f.y));
+	}
 	int realRound(float f)
 	{
 		float tempF = f;
@@ -301,62 +324,68 @@ public class Cursor : MonoBehaviour {
 	}
 
 	//recursively makes the tiles that show a user where they can move
-	void MakeMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
-	{
-
-		//don't overlap movetiles
-		GameObject[] gobj = GameObject.FindGameObjectsWithTag("MoveTile");
-		for(int i = 0; i < gobj.Length; i++)
-		{
-			if(realRound(gobj[i].transform.position.x) == x && realRound(gobj[i].transform.position.y) == y)
-			{
-				return;
-			}
-		}
-
-		//find the tile at that position
-		GameObject[] mt = GameObject.FindGameObjectsWithTag("MapTile");
-		int index =-1;
-		for(int i = 0; i < mt.Length; i++)
-		{
-			if(realRound(mt[i].transform.position.x/spacer) == x && realRound(mt[i].transform.position.y/spacer) == y)
-			{
-				index = i;
-			}
-		}
-		//just error checking here
-		if(index == -1)
-		{
-			print("Index was -1 while at: " + x + " , " + y);
-		}
-
+	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
+	{ 
+		//stop when you cant move
+		if (move <= 0)
+			return;
+		//find the map tile at this spot
+		int index = mapTilePos.IndexOf(new Vector2(x, y));
+		
+		//calculate cost to move their
 		int cost;
 		if (hasMoved)
 		{
-			cost = mt[index].GetComponent<MapTile>().moveCost;
+			cost = ((GameObject)mapTiles[index]).GetComponent<MapTile>().moveCost;
 		}
+		//first step is free (Its the spot the character is already on)
 		else
 		{
 			cost = 0;
 		}
-		//if the player cannot move now, just stop
-		if(move - cost <= 0)
-		{
-			return;
+
+		//dont overlap positions
+		if (!moveTilePositions.Contains(new Vector2(x, y)))
+		{ 
+			//add this postion for spawning
+			moveTilePositions.Add(new Vector2(x, y));
 		}
-		//move up,left,right,down
-		if(y+1 <= realRound(maxY/spacer))
-			MakeMoveTile(move - cost, x, y + 1,charToMove, true);
-		if(x-1 >= 0)
-			MakeMoveTile(move - cost, x - 1, y,charToMove,true);
-		if(x+1 <= realRound(maxX/spacer))
-			MakeMoveTile(move - cost, x + 1, y,charToMove,true);
-		if(y-1 >= 0)
-			MakeMoveTile(move - cost, x, y - 1,charToMove,true);
+
 		
-		//on the way back, make a thing here
-		GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
-		obj.transform.position = new Vector3(x*spacer, y*spacer);
+		//move up,left,right,down
+		if (y + 1 <= realRound(maxY / spacer))
+		{
+			
+			FindMoveTile(move - cost, x, y + 1, charToMove, true);
+		}
+		if (x - 1 >= 0)
+		{
+			FindMoveTile(move - cost, x - 1, y, charToMove, true);
+		}
+		if (x + 1 <= realRound(maxX / spacer))
+		{
+			if (x == 1 && y == 10)
+			{
+				print("Well... ok why is x+1 not working?");
+			}
+			FindMoveTile(move - cost, x + 1, y, charToMove, true);
+		}
+		if (y - 1 >= 0)
+		{
+			FindMoveTile(move - cost, x, y - 1, charToMove, true);
+		}
+	}
+
+	//spawn move tiles into the spots that were given in previous function
+	void MakeMoveTiles()
+	{
+		for (int i = 0; i < moveTilePositions.Count; i++)
+		{
+			//on the way back, make a thing here
+			GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
+			obj.transform.position = RoundPosition((Vector2)moveTilePositions[i]*spacer);
+		}
 	}
 	public int getIntX()
 	{

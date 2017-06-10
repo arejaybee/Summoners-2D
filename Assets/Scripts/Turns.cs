@@ -7,11 +7,13 @@ public class Turns : MonoBehaviour
 	public int numberOfPlayers = 1;
 	public int playerTurn;
 	public GameObject turnDisplay;
+	private HUB hub;
 
 	// Use this for initialization
 	void Start ()
 	{
 		playerTurn = 1;
+		hub = GameObject.FindObjectOfType<HUB>();
 		turnDisplay = GameObject.Find("TurnDisplay");
 	}
 	
@@ -39,6 +41,8 @@ public class Turns : MonoBehaviour
 					if (chars[i].name == "Summoner")
 					{
 						((Summoner)chars[i]).mana += 5;
+						hub.cursor.transform.position = chars[i].transform.position;
+						i = chars.Length + 1;
 					}
 				}
 			}

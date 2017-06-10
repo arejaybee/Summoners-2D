@@ -7,6 +7,8 @@ public class HUB : MonoBehaviour {
 	public MoveMenuHandler moveMenuHandler;
 	public MapGenerator mapGenerator;
 	public CameraController cam;
+	public ArrayList characters;
+	public ArrayList characterPositions;
 
 	//Time since the last time these keys were pressed
 	public float lastTimeX;
@@ -15,6 +17,7 @@ public class HUB : MonoBehaviour {
 	public float lastTimeRight;
 	public float lastTimeUp;
 	public float lastTimeLeft;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -28,11 +31,32 @@ public class HUB : MonoBehaviour {
 		lastTimeZ = Time.time;
 		lastTimeLeft = Time.time;
 		lastTimeRight = Time.time;
+		characters = new ArrayList();
+		characterPositions = new ArrayList();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		
+		characterPositions.Clear();
+		characters.Clear();
+		Character[] chars = GameObject.FindObjectsOfType<Character>();
+		for(int i = 0; i < chars.Length; i++)
+		{
+			characters.Add((Character)chars[i]);
+			characterPositions.Add(cursor.RoundPosition(chars[i].transform.position));
+		}
+	}
+
+	int realRound(float f)
+	{
+		float tempF = f;
+		tempF -= (int)f;
+		tempF *= 10;
+		if ((int)tempF > 4)
+		{
+			return (int)f + 1;
+		}
+		return (int)f;
 	}
 }

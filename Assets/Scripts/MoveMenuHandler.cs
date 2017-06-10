@@ -72,6 +72,7 @@ public class MoveMenuHandler : MonoBehaviour
 				break;
 			case ("Summon"):
 				removeMenu();
+				//move camera to the summon menu (also make a summon menu lol)
 				break;
 			case ("Stop"):
 				removeMenu();
