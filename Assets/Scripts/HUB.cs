@@ -1,4 +1,11 @@
-﻿using System.Collections;
+﻿/*
+ * I found that I was including a lot of different objects, and it was getting pretty cumbersome.
+ * So I made this class to instantiate other classes.
+ * That way I just need to make a HUB object in other classes, and if I want to grab the cursor from the game,
+ * instead of having to find the cursor, I can just do "HUB.cursor". I think this is slightly faster? I dont know.
+ */ 
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +16,8 @@ public class HUB : MonoBehaviour {
 	public CameraController cam;
 	public ArrayList characters;
 	public ArrayList characterPositions;
+	public Summoner summoner1;
+	public Summoner summoner2;
 
 	//Time since the last time these keys were pressed
 	public float lastTimeX;
@@ -45,6 +54,23 @@ public class HUB : MonoBehaviour {
 		{
 			characters.Add((Character)chars[i]);
 			characterPositions.Add(cursor.RoundPosition(chars[i].transform.position));
+
+			//get context of the summoners (if they werent found yet)
+			if(summoner1 == null)
+			{
+				if(chars[i].name == "Summoner" && chars[i].playerNumber == 1)
+				{
+					summoner1 = (Summoner)chars[i];
+				}
+			}
+
+			if (summoner2 == null)
+			{
+				if (chars[i].name == "Summoner" && chars[i].playerNumber == 2)
+				{
+					summoner2 = (Summoner)chars[i];
+				}
+			}
 		}
 	}
 

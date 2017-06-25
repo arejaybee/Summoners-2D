@@ -20,6 +20,7 @@ public class MapGenerator : MonoBehaviour
 		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner2")));
 
 		spacer = hub.cursor.size / 1.5f;
+		//Eventually, I want to be able to pass in a string and have that string be built. So that I can have several pre-built maps that are set to this variable.
 		string tempMap = "MMMGGGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMMMGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGWWGGGGGGGGGGGG GGGGGGGGWWGGGGGGGGGGG GGGGGGGGGWWGGGGGGGGGG GGGGGGGGGGWWWWGGGGGGG GGGGGGGGGWWWWWGGGGGGG GGGGGGGGGGGGGWGGGGGGG GGGGGGGGGGGGGGWGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG";
 		string[] n = tempMap.Split(" "[0]);
 		boundsY = n.Length;
@@ -34,6 +35,7 @@ public class MapGenerator : MonoBehaviour
 	{
 	
 	}
+	//builds a 2d grid based on the string "tempMap" written above
 	void MakeMap(string[] n)
 	{
 		map = new string[n.Length, n[0].Length];
@@ -47,12 +49,17 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
+
+	//I have no clue why I went with "Items" here..
+	//So here, I am spawning MapTiles based on the string given above.
+	//It then places the cursor in the center, and  makes 2 summoners (I may make the 2 summoners thing a part of the map text)
 	void SpawnItems(string[] n)
 	{
 		for (int i = 0; i < n.Length; i++)
 		{
 			for (int j = 0; j < n[0].Length; j++)
 			{
+				//make map tiles
 				GameObject m = null;
 				if (map[i, j] == "M")
 				{
@@ -72,7 +79,9 @@ public class MapGenerator : MonoBehaviour
 				mapTiles[i, j] = m.GetComponent<MapTile>();
 			}
 		}
+		//add a cursor
 		hub.cursor.transform.position = new Vector3(spacer * (int)(n[0].Length/2), spacer * (int)(n.Length/2), 0);
+		//add summoners
 		sum1.transform.position = new Vector3(0, spacer * (int)(n.Length / 2), 0);
 		sum2.transform.position = new Vector3(spacer * (int)(n[0].Length - 1), spacer * (int)(n.Length / 2), 0);
 	}

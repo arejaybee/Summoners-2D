@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * A summoner is a type of unit that can summon other units. 
+ */
 public class Summoner : Character {
 	public int armySize;
 	public int numUnits;
@@ -10,7 +13,7 @@ public class Summoner : Character {
 	// Use this for initialization
 	protected override void Start ()
 	{
-		base.Start();
+		
 		name = "Summoner";
 		maxHp = 25;
 		hp = maxHp;
@@ -24,6 +27,7 @@ public class Summoner : Character {
 		armySize = 10;
 		numUnits = 0;
 		mana = 5;
+		base.Start();
 		extraDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
 	protected override void Update()

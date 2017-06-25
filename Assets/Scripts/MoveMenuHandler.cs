@@ -7,6 +7,7 @@ public class MoveMenuHandler : MonoBehaviour
 	ArrayList menuItems;//all of the menu items
 	private int selectedItem;//the current menu item that is highlighted
 	HUB hub;
+	bool canMove;
 
 
 	// Use this for initialization
@@ -15,12 +16,15 @@ public class MoveMenuHandler : MonoBehaviour
 		hub = GameObject.FindObjectOfType<HUB>();
 		menuItems = new ArrayList();
 		selectedItem = 0;
+		canMove = false;
 	}
 	void Update()
 	{
-		if (menuItems.Count > 0)
+		//If there is need of a menu
+		if (menuItems.Count > 0 && canMove)
 		{
 			((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.green;
+
 			//go down
 			if (Input.GetKey(KeyCode.DownArrow) && Time.time - hub.lastTimeDown >= 0.1f)
 			{
@@ -33,6 +37,7 @@ public class MoveMenuHandler : MonoBehaviour
 				}
 
 			}
+
 			//go up
 			else if (Input.GetKeyDown(KeyCode.UpArrow))
 			{
@@ -43,12 +48,17 @@ public class MoveMenuHandler : MonoBehaviour
 					((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.green;
 				}
 			}
+
+			//pick the green item
 			else if (Input.GetKeyDown(KeyCode.Z))
 			{
+				hub.lastTimeZ = Time.time;
 				passOption(((GameObject)menuItems[selectedItem]).transform.FindChild("Text").GetComponent<TextMesh>().text.ToString());
 				hub.cursor.confirmFromMoveMenu();
 
 			}
+
+			//cancel (return to moving the character)
 			else if (Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f)
 			{
 				hub.lastTimeX = Time.time;
@@ -59,7 +69,9 @@ public class MoveMenuHandler : MonoBehaviour
 		}
 	}
 
-
+	/*
+	 * Funnels the option a player selected to a corresponding function
+	 */ 
 	public void passOption(string option)
 	{
 		switch(option)
@@ -71,8 +83,9 @@ public class MoveMenuHandler : MonoBehaviour
 				removeMenu();
 				break;
 			case ("Summon"):
-				removeMenu();
+				//removeMenu();
 				//move camera to the summon menu (also make a summon menu lol)
+				beginSummoning();
 				break;
 			case ("Stop"):
 				removeMenu();
@@ -99,6 +112,7 @@ public class MoveMenuHandler : MonoBehaviour
 			menuItems.Add(mItem);
 			selectedItem = i;
 		}
+		canMove = true;
 	}
 
 	//clears out the menu. Should always be called when the menu is done with.
@@ -112,5 +126,14 @@ public class MoveMenuHandler : MonoBehaviour
 
 		//just in case there is some left over data here
 		menuItems.Clear();
+	}
+
+	/*
+	 * This function should only be called if a player selected "Summon" as their option
+	 * Should move the camera over to the summoning menu, and allow the controls to only operate that menu.
+	 */ 
+	public void beginSummoning()
+	{
+
 	}
 }

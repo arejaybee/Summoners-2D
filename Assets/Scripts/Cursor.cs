@@ -9,7 +9,7 @@ public class Cursor : MonoBehaviour {
 	public float maxY;
 	public float spacer;
 	public bool cursorCanMove;
-	private bool select;//if this is true, we can pick up a unit
+	public bool select;//if this is true, we can pick up a unit
 	private Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
@@ -48,14 +48,19 @@ public class Cursor : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+		//record the x,y cooridinate the cursor is at currently
 		orgX = transform.position.x;
 		orgY = transform.position.y;
+
+		//if the cursor can move, see if it is being moved
 		if (cursorCanMove)
 		{
 			DetectMovement();
 		}
 		//MouseMovement();
 		//MobileTouchMovement();
+
+		//if there is no character selected, the cursor can go anywhere within the map's bounds
 		if (select)
 		{
 			LimitToBounds();
@@ -240,7 +245,6 @@ public class Cursor : MonoBehaviour {
 		//see if there is a move tile beneath you
 		for(int i = 0; i < moveTiles.Length; i++)
 		{
-		//	print("Found a move tile at: " +realRound(moveTiles[i].transform.position.x/spacer)+" , "+realRound(moveTiles[i].transform.position.y/spacer));
 			if(realRound(moveTiles[i].transform.position.x/spacer) == tempX && realRound(moveTiles[i].transform.position.y/spacer) == tempY)
 			{
 				returnable = true;
@@ -252,6 +256,8 @@ public class Cursor : MonoBehaviour {
 	/*
 	 * When clicking to move, the position doesnt necessarily stay grid like
 	 * This function converts a clicked location into a grid location.
+	 * Note, this function will never be called with the current build. If, later, the program is updated to work with mouse clicks, this function will
+	 * be used to find which square the player clicked on.
 	 */
 	public Vector3 RoundPosition(Vector3 pos)
 	{
@@ -297,6 +303,7 @@ public class Cursor : MonoBehaviour {
 		return newPos;
 	}
 
+	//Finds and deletes each move tile generated from trying to mvoe a character
 	void RemoveMoveTiles()
 	{
 		GameObject[] moveTiles = GameObject.FindGameObjectsWithTag("MoveTile");
@@ -307,10 +314,13 @@ public class Cursor : MonoBehaviour {
 		moveTilePositions.Clear();
 	}
 	
+
+	//Rounds each component of a vector2
 	Vector2 realRound(Vector2 f)
 	{
 		return new Vector2(realRound(f.x), realRound(f.y));
 	}
+	//Rounds numbers
 	int realRound(float f)
 	{
 		float tempF = f;
@@ -365,10 +375,6 @@ public class Cursor : MonoBehaviour {
 		}
 		if (x + 1 <= realRound(maxX / spacer))
 		{
-			if (x == 1 && y == 10)
-			{
-				print("Well... ok why is x+1 not working?");
-			}
 			FindMoveTile(move - cost, x + 1, y, charToMove, true);
 		}
 		if (y - 1 >= 0)
@@ -387,6 +393,8 @@ public class Cursor : MonoBehaviour {
 			obj.transform.position = RoundPosition((Vector2)moveTilePositions[i]*spacer);
 		}
 	}
+
+	//returns the in-grid x,y cooridnate of the cursor
 	public int getIntX()
 	{
 		return realRound(transform.position.x/spacer);

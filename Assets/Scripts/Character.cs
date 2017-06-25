@@ -26,10 +26,11 @@ public class Character : MonoBehaviour
 	public bool counterAttack;
 	public int speech;
 	public int loyalty;
-
+	public string iconPath;
 	//literally just to size/space based on cursor size
 	public Cursor cursor;
 	private float spacer;
+
 	// Use this for initialization
 	protected virtual void Start ()
     {
@@ -47,12 +48,13 @@ public class Character : MonoBehaviour
 		piercing = false;
 		cursor = FindObjectOfType<Cursor>();
 		spacer = cursor.spacer;
-    }
+		iconPath = "Icons/" + name + "Icon";
+	}
 
     // Update is called once per frame
     protected virtual void Update ()
     {
-		
+		//at 0hp, they die!
 		if (hp <= 0f)
         {
             Destroy(this.gameObject);
@@ -73,7 +75,7 @@ public class Character : MonoBehaviour
     {
         if (char2.playerNumber != 0 && char2.playerNumber != playerNumber)
         {
-			if (piercing)
+			if (piercing)//with piecing, characters can simply ignore an opponents defence
 			{
 				char2.hp -= attk;
 			}
@@ -103,6 +105,7 @@ public class Character : MonoBehaviour
 
 	/*
 	 * This is speciffically for units that may attack back
+	 * It is set up nearly the same as fight, but had to be its own function to avoid recursion
 	 */ 
 	public virtual void counter(Character char2)
 	{
@@ -157,6 +160,8 @@ public class Character : MonoBehaviour
     {
         //this is for units with abilities
     }
+
+	//gives the grid place position of a unit
 	public int getIntX()
 	{
 		return realRound(transform.position.x / spacer);
@@ -165,6 +170,8 @@ public class Character : MonoBehaviour
 	{
 		return realRound(transform.position.y / spacer);
 	}
+
+	//rounds numbers (I didnt like the inherent functions)
 	int realRound(float f)
 	{
 		float tempF = f;
@@ -176,6 +183,8 @@ public class Character : MonoBehaviour
 		}
 		return (int)f;
 	}
+
+	//if this comes up, returns the color of a unit (This is from an early build, but may still be useful)
 	public Color getPlayerColor()
 	{
 		if(playerNumber == 1)

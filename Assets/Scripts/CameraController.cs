@@ -19,7 +19,10 @@ public class CameraController : MonoBehaviour {
 		
 		
 	}
-
+	/*
+	 * Used to move the camera.
+	 * There are bounds on the edges of the map to keep the camera from showing things out of the map
+	 */
 	public void moveCamera(Vector3 pos)
 	{
 		maxX = realRound(cursor.maxX / cursor.spacer) - 10;
@@ -48,6 +51,8 @@ public class CameraController : MonoBehaviour {
 		transform.position = new Vector3(tempX, tempY, transform.position.z);
 
 	}
+
+	//Rounders numbers instead of truncating
 	int realRound(float f)
 	{
 		float tempF = f;

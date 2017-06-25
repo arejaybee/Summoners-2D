@@ -20,10 +20,9 @@ public class Turns : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if(Input.GetKeyDown(KeyCode.E))
+		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.select)
 		{
-			//if it was 2, and there are 2 players.
-			//1+1 = 2%3 = 2
+			//increment the turn count, and then set it to 1 if you go overboard
 			playerTurn++;
 			if(playerTurn > numberOfPlayers)
 			{
@@ -40,13 +39,14 @@ public class Turns : MonoBehaviour
 
 					if (chars[i].name == "Summoner")
 					{
-						((Summoner)chars[i]).mana += 5;
-						hub.cursor.transform.position = chars[i].transform.position;
+						((Summoner)chars[i]).mana += 5;//you get 5 mana every turn! (subject to change)
+						hub.cursor.transform.position = chars[i].transform.position;//put the cursor over the in-turn summoner
 						i = chars.Length + 1;
 					}
 				}
 			}
 		}
+		//say whose turn it is
 		turnDisplay.GetComponent<SpriteRenderer>().sprite = Resources.Load("Prefab/Turns/P"+playerTurn+"Turn",typeof(Sprite)) as Sprite;
 	}
 }

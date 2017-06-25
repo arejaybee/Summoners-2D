@@ -33,6 +33,8 @@ public class TopBar : MonoBehaviour
 			topBar.SetActive(false);
 		}
 	}
+
+	//if the cursor is currently on the same tile as a character, return true
 	bool isCursorOnCharacter()
 	{
 		int curX = cursor.getIntX();
@@ -47,15 +49,17 @@ public class TopBar : MonoBehaviour
 		}
 		return false;
 	}
+
+	//display information about the character that the cursor is on.
 	void FillTopInfo()
 	{
 		GameObject hp = topBar.transform.FindChild("HP").gameObject;
 		GameObject hPBar = topBar.transform.FindChild("HPBar").gameObject;
 		GameObject name = topBar.transform.FindChild("Name").gameObject;
-		GameObject characterIcon = topBar.transform.FindChild("CharacterIcon").gameObject;
 		GameObject stats = topBar.transform.FindChild("Stats").gameObject;
 		GameObject playerNum = topBar.transform.FindChild("PlayerNum").gameObject;
 		GameObject description = topBar.transform.FindChild("Description").gameObject;
+		GameObject icon = topBar.transform.FindChild("Icon").gameObject;
 		topBar.GetComponent<SpriteRenderer>().color = selectedChar.getPlayerColor();
 		//set HP
 		hp.GetComponent<TextMesh>().text = "HP: " + selectedChar.hp.ToString() + "/" + selectedChar.maxHp.ToString();
@@ -69,6 +73,9 @@ public class TopBar : MonoBehaviour
 		description.GetComponent<TextMesh>().text = selectedChar.extraDescription;
 
 		//icon
+		icon.GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
+		print("Attempting to load sprite from: " + selectedChar.iconPath);
+
 		//math for HPbar
 		//So as far as I can tell, -5 should be a constant as the length/position of the health bar. This may change if I can find out where the number really comes from.
 		//if you're not me and this is interesting/you want to know why I used -5 to start with, ask me. Lets start a dialogue!
