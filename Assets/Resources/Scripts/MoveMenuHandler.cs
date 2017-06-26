@@ -7,7 +7,7 @@ public class MoveMenuHandler : MonoBehaviour
 	ArrayList menuItems;//all of the menu items
 	private int selectedItem;//the current menu item that is highlighted
 	HUB hub;
-	bool canMove;
+	public bool canMove;
 
 
 	// Use this for initialization
@@ -62,6 +62,7 @@ public class MoveMenuHandler : MonoBehaviour
 			else if (Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f)
 			{
 				hub.lastTimeX = Time.time;
+
 				//find a way to cancel and go back
 				removeMenu();
 				hub.cursor.cursorCanMove = true;
@@ -134,6 +135,9 @@ public class MoveMenuHandler : MonoBehaviour
 	 */ 
 	public void beginSummoning()
 	{
-
+		canMove = false;
+		GameObject.FindObjectOfType<SummonMenu>().canMove = true;
+		hub.cam.toggleChildren();
+		hub.cam.goToSummonMenu();
 	}
 }

@@ -11,6 +11,7 @@ using UnityEngine;
 
 public class HUB : MonoBehaviour {
 	public Cursor cursor;
+	public Turns turn;
 	public MoveMenuHandler moveMenuHandler;
 	public MapGenerator mapGenerator;
 	public CameraController cam;
@@ -42,6 +43,18 @@ public class HUB : MonoBehaviour {
 		lastTimeRight = Time.time;
 		characters = new ArrayList();
 		characterPositions = new ArrayList();
+		turn = FindObjectOfType<Turns>();
+		Summoner[] s = FindObjectsOfType<Summoner>();
+		if(s[0].playerNumber == 1)
+		{
+			summoner1 = s[0];
+			summoner2 = s[1];
+		}
+		else
+		{
+			summoner1 = s[1];
+			summoner2 = s[0];
+		}
 	}
 	
 	// Update is called once per frame
@@ -72,6 +85,16 @@ public class HUB : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	public Summoner getCurrentSummoner()
+	{
+
+		if(turn.playerTurn == 1)
+		{
+			return summoner1;
+		}
+		return summoner2;
 	}
 
 	int realRound(float f)

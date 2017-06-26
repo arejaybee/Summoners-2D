@@ -6,11 +6,12 @@ public class CameraController : MonoBehaviour {
 	private Cursor cursor;
 	private int maxX,minX;
 	private int maxY,minY;
-
+	private bool childFlag;
 	// Use this for initialization
 	void Start ()
 	{
 		cursor = FindObjectOfType<Cursor>();
+		childFlag = true;
 	}
 	
 	// Update is called once per frame
@@ -19,12 +20,14 @@ public class CameraController : MonoBehaviour {
 		
 		
 	}
+
 	/*
 	 * Used to move the camera.
 	 * There are bounds on the edges of the map to keep the camera from showing things out of the map
 	 */
 	public void moveCamera(Vector3 pos)
 	{
+		GetComponent<Camera>().orthographicSize = 19;
 		maxX = realRound(cursor.maxX / cursor.spacer) - 10;
 		maxY = realRound(cursor.maxY / cursor.spacer) - 3;
 		minX = 0 + 10;
@@ -64,4 +67,19 @@ public class CameraController : MonoBehaviour {
 		}
 		return (int)f;
 	}
+
+	public void toggleChildren()
+	{
+		childFlag = !childFlag;
+		foreach(Transform child in transform)
+		{
+			child.gameObject.SetActive(childFlag);
+		}
+	}
+	public void goToSummonMenu()
+	{
+		transform.position = new Vector3(-500, 0, transform.position.z);
+		GetComponent<Camera>().orthographicSize = 15;
+	}
+
 }

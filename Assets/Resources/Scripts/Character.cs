@@ -197,4 +197,13 @@ public class Character : MonoBehaviour
 		}
 		return Color.white;
 	}
+
+	public int CompareTo(Character b)
+	{
+		if (b == null)
+		{
+			return 1;
+		}
+		return this.name.CompareTo(b.name);
+	}
 }

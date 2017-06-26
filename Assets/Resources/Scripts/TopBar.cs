@@ -21,7 +21,8 @@ public class TopBar : MonoBehaviour
 	{
 		//see if the cursor is on a character
 		chars = FindObjectsOfType<Character>();
-		if (isCursorOnCharacter())
+		SummonMenu summonMenu = GameObject.FindObjectOfType<SummonMenu>();
+		if (isCursorOnCharacter() && !summonMenu.canMove)
 		{
 			//if so there is a bar, and it needs info
 			topBar.SetActive(true);
