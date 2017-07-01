@@ -10,7 +10,7 @@ public class Cursor : MonoBehaviour {
 	public float spacer;
 	public bool cursorCanMove;
 	public bool select;//if this is true, we can pick up a unit
-	private Character selectedCharacter;
+	public Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
 	private Character unselectableSummoner;
@@ -148,6 +148,13 @@ public class Cursor : MonoBehaviour {
 		{
 			list.Add("Summon");
 		}
+		//add Attack
+		if(hub.enemyInRange(selectedCharacter))
+		{
+			list.Add("Attack");
+		}
+		//add Speak
+		//add Heal
 		list.Add("Stop");
 		cursorCanMove = false;
 		Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
@@ -158,9 +165,15 @@ public class Cursor : MonoBehaviour {
 	//on cancel we just move around again
 	public void confirmFromMoveMenu()
 	{
-		selectedCharacter.canMove = false;
-		selectedCharacter = null;
+		print("This function was called");
+		if (selectedCharacter != null)
+		{
+			selectedCharacter.canMove = false;
+			selectedCharacter = null;
+		}
+		hub.enemyPositions.Clear();
 		select = true;
+		cursorCanMove = true;
 		//remove the move tiles
 		RemoveMoveTiles();
 	}
@@ -170,7 +183,7 @@ public class Cursor : MonoBehaviour {
 	 * */
 	void DetectSelect()
 	{
-		Character c = (Character)hub.characters[hub.characterPositions.IndexOf(RoundPosition(transform.position))];
+		Character c = hub.findCharacterAt(transform.position);
 		if (c.playerNumber == turn.playerTurn)
 		{
 			if (c.canMove)
@@ -301,6 +314,11 @@ public class Cursor : MonoBehaviour {
 		Vector2 newPos = new Vector2(xPos, yPos);
 
 		return newPos;
+	}
+
+	public void MoveTo(int x, int y)
+	{
+		transform.position = new Vector2(x * spacer, y * spacer);
 	}
 
 	//Finds and deletes each move tile generated from trying to mvoe a character

@@ -28,7 +28,7 @@ public class Character : MonoBehaviour
 	public int loyalty;
 	public string iconPath;
 	//literally just to size/space based on cursor size
-	public Cursor cursor;
+	public HUB hub;
 	private float spacer;
 
 	// Use this for initialization
@@ -46,8 +46,8 @@ public class Character : MonoBehaviour
         canMove = true;
 		counterAttack = false;
 		piercing = false;
-		cursor = FindObjectOfType<Cursor>();
-		spacer = cursor.spacer;
+		hub = FindObjectOfType<HUB>();
+		spacer = hub.cursor.spacer;
 		iconPath = "Icons/" + name + "Icon";
 	}
 
@@ -65,6 +65,13 @@ public class Character : MonoBehaviour
             description = description + "\nStun for: " + Mathf.CeilToInt((float)(stun-1) / 2) + " rounds";
         }
     }
+
+	public void CreateCharacter()
+	{
+		Start();
+		playerNumber = hub.turn.playerTurn;
+	
+	}
 
     /*
      * Precondition: There are two Characters

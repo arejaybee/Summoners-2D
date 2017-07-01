@@ -8,6 +8,7 @@ public class Dragon : Character
     // Use this for initialization
     protected override void Start()
     {
+		base.Start();
         name = "Dragon";
         maxHp = 10;
         hp = 10;
@@ -24,15 +25,33 @@ public class Dragon : Character
     protected override void Update()
     {
         base.Update();
-		if (GameObject.Find("Summoner" + playerNumber + "(clone)").GetComponent<Summoner>().mana <= 0)
+		if (playerNumber == 1)
 		{
-			Destroy(this);
+			if (hub.summoner1.mana <= 0)
+			{
+				Destroy(this);
+			}
+		}
+		else if (playerNumber == 2)
+		{
+			if (hub.summoner2.mana <= 0)
+			{
+				Destroy(this);
+			}
 		}
 	}
 
     //dragons drain a player's mana at the end of a turn
     public override void EndTurn()
     {
-		GameObject.Find("Summoner" + playerNumber + "(clone)").GetComponent<Summoner>().mana -= 30;
+		if(playerNumber == 1)
+		{
+			hub.summoner1.mana -= 30;
+		}
+		else if (playerNumber == 2)
+		{
+			hub.summoner2.mana -= 30;
+		}
+
 	}
 }

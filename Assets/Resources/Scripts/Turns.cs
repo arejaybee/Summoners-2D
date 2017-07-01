@@ -22,6 +22,19 @@ public class Turns : MonoBehaviour
 	{
 		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.select)
 		{
+
+
+			Character[] chars = FindObjectsOfType<Character>();
+	
+			//proc all of the end of turn abilities
+			for(int i = 0; i < chars.Length; i++)
+			{
+				if(chars[i].playerNumber == playerTurn)
+				{
+					chars[i].EndTurn();
+				}
+			}
+
 			//increment the turn count, and then set it to 1 if you go overboard
 			playerTurn++;
 			if(playerTurn > numberOfPlayers)
@@ -30,8 +43,7 @@ public class Turns : MonoBehaviour
 			}
 
 			//set all characters who's turn it is to able to move
-			Character[] chars = FindObjectsOfType<Character>();
-			for(int i = 0; i < chars.Length; i++)
+			for (int i = 0; i < chars.Length; i++)
 			{
 				if(chars[i].playerNumber == playerTurn)
 				{

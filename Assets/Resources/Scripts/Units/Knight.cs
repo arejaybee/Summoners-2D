@@ -8,6 +8,7 @@ public class Knight : Character
 	// Use this for initialization
 	protected override void Start ()
 	{
+		base.Start();
 		name = "Knight";
 		maxHp = 10;
 		hp = 10;

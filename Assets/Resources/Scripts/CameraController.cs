@@ -71,7 +71,15 @@ public class CameraController : MonoBehaviour {
 	public void toggleChildren()
 	{
 		childFlag = !childFlag;
-		foreach(Transform child in transform)
+		foreach (Transform child in transform)
+		{
+			child.gameObject.SetActive(childFlag);
+		}
+	}
+	public void toggleChildren(bool flag)
+	{
+		childFlag = flag;
+		foreach (Transform child in transform)
 		{
 			child.gameObject.SetActive(childFlag);
 		}

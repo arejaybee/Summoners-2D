@@ -7,6 +7,7 @@ public class Fairy : Character {
 	// Use this for initialization
 	protected override void Start ()
     {
+		base.Start();
         name = "Fairy";
         maxHp = 1;
         hp = 1;
@@ -22,6 +23,13 @@ public class Fairy : Character {
     //Fairies add 3 to the player's mana pool each turn
     public override void EndTurn()
     {
-		GameObject.Find("Summoner" + playerNumber + "(clone)").GetComponent<Summoner>().mana += 3;
+		if(playerNumber == 1)
+		{
+			hub.summoner1.mana += 3;
+		}
+		else
+		{
+			hub.summoner2.mana += 3;
+		}
     }
 }

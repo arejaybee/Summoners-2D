@@ -53,7 +53,7 @@ public class SummonMenu : MonoBehaviour
 	{
 		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\nSPCH: "+ summonOptions[index].c .speech+ "\t\tLOY: "+ summonOptions[index].c.loyalty+ "\n"+summonOptions[index].c.extraDescription+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+hub.getCurrentSummoner().mana;
 		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
-		print(selectedChar.iconPath);
+		//print(selectedChar.iconPath);
 		GameObject.Find("StatDisplay").transform.FindChild("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
 	}
 
@@ -126,7 +126,11 @@ public class SummonMenu : MonoBehaviour
 		//select a character
 		else if(Input.GetKeyDown(KeyCode.Z))
 		{
-			SummonCharacter(selectedChar);
+			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
+			if (selectedChar.cost <= hub.getCurrentSummoner().mana)
+			{
+				SummonCharacter(selectedChar);
+			}
 		}
 		//go back to the map
 		else if(Input.GetKeyDown(KeyCode.X))
@@ -141,12 +145,34 @@ public class SummonMenu : MonoBehaviour
 
 	void SummonCharacter(Character c)
 	{
-		print("WIP");
+		//print("WIP");
+		//set this menu's canMove flag.
+		canMove = false;
+		//set the other can move flags.
+		hub.moveMenuHandler.canMove = false;
+
+		//put an instance of this character onto the cursor
+		GameObject createdCharacter = (GameObject)GameObject.Instantiate(Resources.Load("Prefab/Characters/Units/" + c.name));
+		createdCharacter.GetComponent<Character>().CreateCharacter();
+		hub.summoner1.mana -= c.cost;
+		Destroy(c);
+
+		//put that character onto the cursor
+		hub.cursor.MoveTo(hub.cursor.getIntX()+1, hub.cursor.getIntY());
+		createdCharacter.transform.position = hub.cursor.transform.position;
+
+		//move the camera
+		hub.cam.moveCamera(hub.cursor.transform.position);
+		hub.cam.toggleChildren(true);
+		hub.cursor.confirmFromMoveMenu();
+		hub.moveMenuHandler.removeMenu();
+
+		//create purple squares where a summon is possible
+
 	}
 	void sortByName()
 	{
 		canAfford = canAfford.OrderBy(g => g.c.name).ToList();
-		print("CannotAfford has: " + cannotAfford.Count);
 		cannotAfford = cannotAfford.OrderBy(g => g.c.name).ToList();
 	}
 

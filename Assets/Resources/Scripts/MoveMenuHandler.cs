@@ -54,7 +54,6 @@ public class MoveMenuHandler : MonoBehaviour
 			{
 				hub.lastTimeZ = Time.time;
 				passOption(((GameObject)menuItems[selectedItem]).transform.FindChild("Text").GetComponent<TextMesh>().text.ToString());
-				hub.cursor.confirmFromMoveMenu();
 
 			}
 
@@ -78,6 +77,8 @@ public class MoveMenuHandler : MonoBehaviour
 		switch(option)
 		{
 			case ("Attack"):
+				attack();
+				hub.cursor.confirmFromMoveMenu();
 				removeMenu();
 				break;
 			case ("Speak"):
@@ -90,7 +91,7 @@ public class MoveMenuHandler : MonoBehaviour
 				break;
 			case ("Stop"):
 				removeMenu();
-				hub.cursor.cursorCanMove = true; //give player control over their cursor again
+				hub.cursor.confirmFromMoveMenu();
 				break;
 			default:
 				print("This should not happpen. We got the option: " + option);
@@ -139,5 +140,12 @@ public class MoveMenuHandler : MonoBehaviour
 		GameObject.FindObjectOfType<SummonMenu>().canMove = true;
 		hub.cam.toggleChildren();
 		hub.cam.goToSummonMenu();
+	}
+	public void attack()
+	{
+		for(int i = 0; i < hub.enemyPositions.Count; i++)
+		{
+			hub.cursor.selectedCharacter.fight(hub.findCharacterAt((Vector2)hub.enemyPositions[i]));
+		}
 	}
 }
