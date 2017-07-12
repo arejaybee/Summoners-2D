@@ -126,6 +126,7 @@ public class SummonMenu : MonoBehaviour
 		//select a character
 		else if(Input.GetKeyDown(KeyCode.Z))
 		{
+			hub.lastTimeZ = Time.time;
 			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
 			if (selectedChar.cost <= hub.getCurrentSummoner().mana)
 			{
@@ -151,25 +152,32 @@ public class SummonMenu : MonoBehaviour
 		//set the other can move flags.
 		hub.moveMenuHandler.canMove = false;
 
-		//put an instance of this character onto the cursor
+		//make an instance of this character
 		GameObject createdCharacter = (GameObject)GameObject.Instantiate(Resources.Load("Prefab/Characters/Units/" + c.name));
 		createdCharacter.GetComponent<Character>().CreateCharacter();
 		hub.summoner1.mana -= c.cost;
 		Destroy(c);
 
+		//make tiles showing where they can summon
+		hub.MakeTiles("SummonTile");
+
 		//put that character onto the cursor
-		hub.cursor.MoveTo(hub.cursor.getIntX()+1, hub.cursor.getIntY());
+		hub.cursor.MoveTo((Vector2)hub.summonPositions[0]);
 		createdCharacter.transform.position = hub.cursor.transform.position;
+
+		//assign the cursor to the character
+		//set up movement so that it only moves on the summonable tiles
+		//let Confirm button place the character and delete the tiles
 
 		//move the camera
 		hub.cam.moveCamera(hub.cursor.transform.position);
 		hub.cam.toggleChildren(true);
 		hub.cursor.confirmFromMoveMenu();
 		hub.moveMenuHandler.removeMenu();
-
-		//create purple squares where a summon is possible
+		
 
 	}
+
 	void sortByName()
 	{
 		canAfford = canAfford.OrderBy(g => g.c.name).ToList();

@@ -14,12 +14,9 @@ public class Cursor : MonoBehaviour {
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
 	private Character unselectableSummoner;
-	private ArrayList mapTiles;
-	private ArrayList mapTilePos;
 	HUB hub;
 	Turns turn;
 	private bool mapFlag;
-	private ArrayList moveTilePositions;
 
 	// Use this for initialization
 	void Start()
@@ -35,15 +32,6 @@ public class Cursor : MonoBehaviour {
 		maxX = spacer * (hub.mapGenerator.boundsX - 1);
 		maxY = spacer * (hub.mapGenerator.boundsY - 1);
 		mapFlag = true;
-		mapTiles = new ArrayList();
-		mapTilePos = new ArrayList();
-		GameObject[] mt = GameObject.FindGameObjectsWithTag("MapTile");
-		for (int i = 0; i < mt.Length; i++)
-		{
-			mapTiles.Add(mt[i]);
-			mapTilePos.Add(new Vector2(realRound(mt[i].transform.position.x / spacer), realRound(mt[i].transform.position.y/spacer)));
-		}
-		moveTilePositions = new ArrayList();
 	}
 	// Update is called once per frame
 	void Update ()
@@ -132,7 +120,7 @@ public class Cursor : MonoBehaviour {
 			selectedCharacter = null;
 			select = true;
 			//remove the move tiles
-			RemoveMoveTiles();
+			hub.RemoveTiles("MoveTile");
 		}
 
 		hub.cam.moveCamera(transform.position+mv);
@@ -144,7 +132,7 @@ public class Cursor : MonoBehaviour {
 	void GoToMoveMenu()
 	{
 		ArrayList list = new ArrayList();
-		if(selectedCharacter.name.Contains("Summoner"))
+		if (selectedCharacter.name.Contains("Summoner") && hub.canSummon())
 		{
 			list.Add("Summon");
 		}
@@ -175,7 +163,7 @@ public class Cursor : MonoBehaviour {
 		select = true;
 		cursorCanMove = true;
 		//remove the move tiles
-		RemoveMoveTiles();
+		hub.RemoveTiles("MoveTile");
 	}
 	/*
 	 * This function will see if there is a character to select
@@ -215,8 +203,8 @@ public class Cursor : MonoBehaviour {
 			//print("Character is at: " + oX + " , " + oY);
 
 			//displays all of the possible spaces that character can move to
-			FindMoveTile(selectedCharacter.move, oX, oY,selectedCharacter,false);
-			MakeMoveTiles();
+			hub.FindMoveTile(selectedCharacter.move, oX, oY,selectedCharacter,false);
+			hub.MakeTiles("MoveTile");
 		}
 	}
 
@@ -316,21 +304,12 @@ public class Cursor : MonoBehaviour {
 		return newPos;
 	}
 
-	public void MoveTo(int x, int y)
+	public void MoveTo(Vector2 pos)
 	{
-		transform.position = new Vector2(x * spacer, y * spacer);
+		transform.position = new Vector2(pos.x * spacer, pos.y * spacer);
 	}
 
-	//Finds and deletes each move tile generated from trying to mvoe a character
-	void RemoveMoveTiles()
-	{
-		GameObject[] moveTiles = GameObject.FindGameObjectsWithTag("MoveTile");
-		for (int i = 0; i < moveTiles.Length; i++)
-		{
-			GameObject.Destroy(moveTiles[i]);
-		}
-		moveTilePositions.Clear();
-	}
+
 	
 
 	//Rounds each component of a vector2
@@ -349,67 +328,6 @@ public class Cursor : MonoBehaviour {
 			return (int)f + 1;
 		}
 		return (int)f;
-	}
-
-	//recursively makes the tiles that show a user where they can move
-	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
-	void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
-	{ 
-		//stop when you cant move
-		if (move <= 0)
-			return;
-		//find the map tile at this spot
-		int index = mapTilePos.IndexOf(new Vector2(x, y));
-		
-		//calculate cost to move their
-		int cost;
-		if (hasMoved)
-		{
-			cost = ((GameObject)mapTiles[index]).GetComponent<MapTile>().moveCost;
-		}
-		//first step is free (Its the spot the character is already on)
-		else
-		{
-			cost = 0;
-		}
-
-		//dont overlap positions
-		if (!moveTilePositions.Contains(new Vector2(x, y)))
-		{ 
-			//add this postion for spawning
-			moveTilePositions.Add(new Vector2(x, y));
-		}
-
-		
-		//move up,left,right,down
-		if (y + 1 <= realRound(maxY / spacer))
-		{
-			
-			FindMoveTile(move - cost, x, y + 1, charToMove, true);
-		}
-		if (x - 1 >= 0)
-		{
-			FindMoveTile(move - cost, x - 1, y, charToMove, true);
-		}
-		if (x + 1 <= realRound(maxX / spacer))
-		{
-			FindMoveTile(move - cost, x + 1, y, charToMove, true);
-		}
-		if (y - 1 >= 0)
-		{
-			FindMoveTile(move - cost, x, y - 1, charToMove, true);
-		}
-	}
-
-	//spawn move tiles into the spots that were given in previous function
-	void MakeMoveTiles()
-	{
-		for (int i = 0; i < moveTilePositions.Count; i++)
-		{
-			//on the way back, make a thing here
-			GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MoveTile"));
-			obj.transform.position = RoundPosition((Vector2)moveTilePositions[i]*spacer);
-		}
 	}
 
 	//returns the in-grid x,y cooridnate of the cursor

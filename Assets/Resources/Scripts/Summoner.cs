@@ -19,7 +19,7 @@ public class Summoner : Character {
 		hp = maxHp;
 		move = 3;
 		attkRange = 3;
-		summonRange = 1;
+		summonRange = 3;
 		attk = 5;
 		defense = 1;
 		cost = 0;

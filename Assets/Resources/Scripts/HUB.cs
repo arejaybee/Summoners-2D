@@ -20,6 +20,8 @@ public class HUB : MonoBehaviour {
 	public Summoner summoner1;
 	public Summoner summoner2;
 	public ArrayList enemyPositions;
+	public float spacer;
+	public ArrayList summonPositions;
 
 	//Time since the last time these keys were pressed
 	public float lastTimeX;
@@ -29,6 +31,11 @@ public class HUB : MonoBehaviour {
 	public float lastTimeUp;
 	public float lastTimeLeft;
 	Character[] chars;
+
+
+	private ArrayList mapTiles;
+	private ArrayList mapTilePos;
+	private ArrayList moveTilePositions;
 
 	// Use this for initialization
 	void Start ()
@@ -48,6 +55,8 @@ public class HUB : MonoBehaviour {
 		turn = FindObjectOfType<Turns>();
 		Summoner[] s = FindObjectsOfType<Summoner>();
 		enemyPositions = new ArrayList();
+		summonPositions = new ArrayList();
+
 		if(s[0].playerNumber == 1)
 		{
 			summoner1 = s[0];
@@ -58,6 +67,19 @@ public class HUB : MonoBehaviour {
 			summoner1 = s[1];
 			summoner2 = s[0];
 		}
+
+		spacer = cursor.size / 1.5f;
+		mapTiles = new ArrayList();
+		mapTilePos = new ArrayList();
+
+		GameObject[] mt = GameObject.FindGameObjectsWithTag("MapTile");
+		moveTilePositions = new ArrayList();
+		for (int i = 0; i < mt.Length; i++)
+		{
+			mapTiles.Add(mt[i]);
+			mapTilePos.Add(new Vector2(realRound(mt[i].transform.position.x / spacer), realRound(mt[i].transform.position.y / spacer)));
+		}
+	
 	}
 	
 	// Update is called once per frame
@@ -70,34 +92,28 @@ public class HUB : MonoBehaviour {
 		{
 			characters.Add((Character)chars[i]);
 			characterPositions.Add(cursor.RoundPosition(chars[i].transform.position));
-			print("There is a " + chars[i].name + " at position: " + characterPositions[i]);
 			//get context of the summoners (if they werent found yet)
-			if(summoner1 == null)
-			{
-				if(chars[i].name == "Summoner" && chars[i].playerNumber == 1)
+			if(chars[i].name == "Summoner" && chars[i].playerNumber == 1)
 				{
 					summoner1 = (Summoner)chars[i];
 				}
-			}
-
-			if (summoner2 == null)
-			{
-				if (chars[i].name == "Summoner" && chars[i].playerNumber == 2)
+			if (chars[i].name == "Summoner" && chars[i].playerNumber == 2)
 				{
 					summoner2 = (Summoner)chars[i];
 				}
 			}
-		}
 	}
 
 	public Summoner getCurrentSummoner()
 	{
 
-		if(turn.playerTurn == 1)
+		Summoner[] sm = GameObject.FindObjectsOfType<Summoner>();
+		if (sm[0].playerNumber == turn.playerTurn)
 		{
-			return summoner1;
+			return sm[0];
 		}
-		return summoner2;
+		else
+			return sm[1];
 	}
 
 	//given a position, find a character that is at the position
@@ -105,7 +121,7 @@ public class HUB : MonoBehaviour {
 	{
 		for(int i = 0; i < chars.Length; i++)
 		{
-			if(chars[i].getIntX() == realRound(pos.x/cursor.spacer) && chars[i].getIntY() == realRound(pos.y/cursor.spacer))
+			if(chars[i].getIntX() == realRound(pos.x/spacer) && chars[i].getIntY() == realRound(pos.y/spacer))
 			{
 				return chars[i];
 			}
@@ -177,6 +193,161 @@ public class HUB : MonoBehaviour {
 		if (y - 1 >= 0)
 		{
 			findEnemies(characterPos, range-1, x, y - 1, playerNumber);
+		}
+	}
+
+	//recursively makes the tiles that show a user where they can move
+	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	public void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
+	{
+		//stop when you cant move
+		if (move <= 0)
+			return;
+		
+		//find the map tile at this spot
+		int index = mapTilePos.IndexOf(new Vector2(x, y));
+
+		//calculate cost to move their
+		int cost;
+		if (hasMoved)
+		{
+			cost = ((GameObject)mapTiles[index]).GetComponent<MapTile>().moveCost;
+		}
+		//first step is free (Its the spot the character is already on)
+		else
+		{
+			cost = 0;
+		}
+		
+		//dont overlap positions
+		if (!moveTilePositions.Contains(new Vector2(x, y)))
+		{
+			//add this postion for spawning
+			moveTilePositions.Add(new Vector2(x, y));
+		}
+		
+		//move up,left,right,down
+		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
+		{
+
+			FindMoveTile(move - cost, x, y + 1, charToMove, true);
+		}
+		if (x - 1 >= 0)
+		{
+			FindMoveTile(move - cost, x - 1, y, charToMove, true);
+		}
+		if (x + 1 <= realRound(cursor.maxX / cursor.spacer))
+		{
+			FindMoveTile(move - cost, x + 1, y, charToMove, true);
+		}
+		if (y - 1 >= 0)
+		{
+			FindMoveTile(move - cost, x, y - 1, charToMove, true);
+		}
+	}
+
+	//spawn move tiles into the spots that were given in previous function
+	public void MakeTiles(string name)
+	{
+		int length = 0;
+		switch(name)
+		{
+			case ("MoveTile"):
+				length = moveTilePositions.Count;
+				break;
+			case ("AttackTile"):
+				length = enemyPositions.Count;
+				break;
+			case ("SummonTile"):
+				length = summonPositions.Count;
+				break;
+		}
+		for (int i = 0; i < length; i++)
+		{
+			//on the way back, make a thing here
+			GameObject obj = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/" + name));
+			switch (name)
+			{
+				case ("MoveTile"):
+					obj.transform.position = cursor.RoundPosition((Vector2)moveTilePositions[i] * cursor.spacer);
+					break;
+				case ("AttackTile"):
+					obj.transform.position = cursor.RoundPosition((Vector2)enemyPositions[i] * cursor.spacer);
+					break;
+				case ("SummonTile"):
+					print("Summon pos has a length of: " + summonPositions.Count);
+					obj.transform.position = cursor.RoundPosition((Vector2)summonPositions[i] * cursor.spacer);
+					break;
+			}
+		}
+	}
+
+	//Finds and deletes each move tile generated from trying to mvoe a character
+	public void RemoveTiles(string name)
+	{
+		GameObject[] tiles = GameObject.FindGameObjectsWithTag(name);
+		for (int i = 0; i < tiles.Length; i++)
+		{
+			GameObject.Destroy(tiles[i]);
+		}
+		switch(name)
+		{
+			case ("SummonTile"):
+				summonPositions.Clear();
+				break;
+			case ("MoveTile"):
+				moveTilePositions.Clear();
+				break;
+			case ("EnemyTile"):
+				enemyPositions.Clear();
+				break;
+		}
+	}
+
+	public bool canSummon()
+	{
+		findPlacesToSummon(summonPositions,getCurrentSummoner().summonRange,getCurrentSummoner().getIntX(), getCurrentSummoner().getIntY());
+		if(summonPositions.Count > 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	//recursively makes the tiles that show a user where they can move
+	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	void findPlacesToSummon(ArrayList characterPos, float range, int x, int y)
+	{
+		//stop when you cant move
+		if (range < 0)
+			return;
+
+		print("Can we put a tile down at: " + x + " , " + y + " ? With a range of: "+range);
+		//dont overlap positions and only add if the characterPossitino array doesnt have this position
+		if (!characterPos.Contains(new Vector2(x, y)) && !characterPositions.Contains(cursor.RoundPosition(new Vector2(x*spacer, y*spacer))))
+		//if(!characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
+		{
+			//if so, add this postion for spawning
+			characterPos.Add(new Vector2(x, y));
+		}
+
+
+		//move up,left,right,down
+		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
+		{
+			findPlacesToSummon(characterPos, range - 1, x, y + 1);
+		}
+		if (x - 1 >= 0)
+		{
+			findPlacesToSummon(characterPos, range - 1, x - 1, y);
+		}
+		if (x + 1 <= realRound(cursor.maxX / cursor.spacer))
+		{
+			findPlacesToSummon(characterPos, range - 1, x + 1, y);
+		}
+		if (y - 1 >= 0)
+		{
+			findPlacesToSummon(characterPos, range - 1, x, y - 1);
 		}
 	}
 
