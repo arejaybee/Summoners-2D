@@ -138,6 +138,7 @@ public class SummonMenu : MonoBehaviour
 		else if(Input.GetKeyDown(KeyCode.X))
 		{
 			hub.lastTimeX = Time.time;
+			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
 			canMove = false;
 			hub.cam.moveCamera(hub.cursor.transform.position);
 			hub.cam.toggleChildren();
@@ -162,12 +163,21 @@ public class SummonMenu : MonoBehaviour
 		hub.MakeTiles("SummonTile");
 
 		//put that character onto the cursor
+		print(hub.summonPositions.Count);
 		hub.cursor.MoveTo((Vector2)hub.summonPositions[0]);
 		createdCharacter.transform.position = hub.cursor.transform.position;
 
+		//tell the cursor to stop caring about the summoner (if it did)
+		if (hub.cursor.selectedCharacter != null)
+		{
+			hub.cursor.selectedCharacter.canMove = false;
+			hub.cursor.selectedCharacter = null;
+		}
 		//assign the cursor to the character
-		//set up movement so that it only moves on the summonable tiles
-		//let Confirm button place the character and delete the tiles
+		hub.cursor.select = false;
+		hub.cursor.summoning = true;
+		hub.cursor.selectedCharacter = createdCharacter.GetComponent<Character>();
+		//let Confirm button place the character and delete the tiles(done in cursor)
 
 		//move the camera
 		hub.cam.moveCamera(hub.cursor.transform.position);

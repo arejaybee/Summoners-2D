@@ -10,6 +10,7 @@ public class Cursor : MonoBehaviour {
 	public float spacer;
 	public bool cursorCanMove;
 	public bool select;//if this is true, we can pick up a unit
+	public bool summoning;
 	public Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
@@ -32,6 +33,7 @@ public class Cursor : MonoBehaviour {
 		maxX = spacer * (hub.mapGenerator.boundsX - 1);
 		maxY = spacer * (hub.mapGenerator.boundsY - 1);
 		mapFlag = true;
+		summoning = false;
 	}
 	// Update is called once per frame
 	void Update ()
@@ -49,7 +51,9 @@ public class Cursor : MonoBehaviour {
 		//MobileTouchMovement();
 
 		//if there is no character selected, the cursor can go anywhere within the map's bounds
-		if (select)
+		//If we are summoning, there will also be no limit to where the cursor can move. This was done because
+		//there will be cases where some summon tiles are cut off from the rest, so moving to them will be harder with bounds.
+		if (select || summoning)
 		{
 			LimitToBounds();
 		}
@@ -100,9 +104,21 @@ public class Cursor : MonoBehaviour {
 		{
 			hub.lastTimeZ = Time.time;
 			//if you have not selected a character, do so
-			if (select)
+			if (select && !summoning)
 			{
 				DetectSelect();
+			}
+			//if the character hits confirm, check if there is a summon tile, if so, place the unit there
+			else if(summoning)
+			{
+				if(isOnTile("SummonTile"))
+				{
+					select = true;
+					summoning = false;
+					hub.RemoveTiles("SummonTile");
+					selectedCharacter = null;
+				}
+				//fill later
 			}
 			//if you have a character selected, give them options from this point
 			else
@@ -125,6 +141,28 @@ public class Cursor : MonoBehaviour {
 
 		hub.cam.moveCamera(transform.position+mv);
 		transform.position += mv;
+	}
+
+	bool isOnTile(string name)
+	{
+		bool ret = false;
+		switch(name)
+		{
+			case ("SummonTile"):
+				if(hub.summonPositions.Contains(new Vector2(getIntX(),getIntY())))
+				{
+					ret = true;
+				}
+				break;
+			case ("MoveTile"):
+				break;
+			case ("AttackTile"):
+				break;
+			default:
+				return false;
+		}
+		return ret;
+
 	}
 
 	//Enters the MoveMenu script.
@@ -153,8 +191,7 @@ public class Cursor : MonoBehaviour {
 	//on cancel we just move around again
 	public void confirmFromMoveMenu()
 	{
-		print("This function was called");
-		if (selectedCharacter != null)
+		if (selectedCharacter != null && !summoning)
 		{
 			selectedCharacter.canMove = false;
 			selectedCharacter = null;
@@ -181,7 +218,7 @@ public class Cursor : MonoBehaviour {
 				charOrgX = selectedCharacter.transform.position.x;
 				charOrgY = selectedCharacter.transform.position.y;
 			}
-			else if (c.name == "Summoner")
+			else if (c.name == "Summoner" && hub.canSummon())
 			{
 				cursorCanMove = false;
 				ArrayList list = new ArrayList();

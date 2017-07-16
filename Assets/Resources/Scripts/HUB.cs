@@ -278,7 +278,6 @@ public class HUB : MonoBehaviour {
 					obj.transform.position = cursor.RoundPosition((Vector2)enemyPositions[i] * cursor.spacer);
 					break;
 				case ("SummonTile"):
-					print("Summon pos has a length of: " + summonPositions.Count);
 					obj.transform.position = cursor.RoundPosition((Vector2)summonPositions[i] * cursor.spacer);
 					break;
 			}
@@ -326,7 +325,7 @@ public class HUB : MonoBehaviour {
 		if (range < 0)
 			return;
 
-		print("Can we put a tile down at: " + x + " , " + y + " ? With a range of: "+range);
+		//print("Can we put a tile down at: " + x + " , " + y + " ? With a range of: "+range);
 		//dont overlap positions and only add if the characterPossitino array doesnt have this position
 		if (!characterPos.Contains(new Vector2(x, y)) && !characterPositions.Contains(cursor.RoundPosition(new Vector2(x*spacer, y*spacer))))
 		//if(!characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
