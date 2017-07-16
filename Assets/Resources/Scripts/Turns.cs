@@ -23,7 +23,6 @@ public class Turns : MonoBehaviour
 		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.select)
 		{
 
-
 			Character[] chars = FindObjectsOfType<Character>();
 	
 			//proc all of the end of turn abilities

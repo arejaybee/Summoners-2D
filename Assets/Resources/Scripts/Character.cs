@@ -168,7 +168,7 @@ public class Character : MonoBehaviour
         //this is for units with abilities
     }
 
-	//gives the grid place position of a unit
+	//gives the grid place position of a unit given their world position
 	public int getIntX()
 	{
 		return realRound(transform.position.x / spacer);

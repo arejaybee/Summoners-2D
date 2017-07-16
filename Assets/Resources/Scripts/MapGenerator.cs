@@ -35,6 +35,7 @@ public class MapGenerator : MonoBehaviour
 	{
 	
 	}
+
 	//builds a 2d grid based on the string "tempMap" written above
 	void MakeMap(string[] n)
 	{

@@ -161,8 +161,10 @@ public class HUB : MonoBehaviour {
 		}
 		return flag;
 	}
+
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	//x and y here are in grid space
 	void findEnemies(ArrayList characterPos, float range, int x, int y, float playerNumber)
 	{
 		//stop when you cant move
@@ -198,6 +200,7 @@ public class HUB : MonoBehaviour {
 
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	//x and y are in grid space
 	public void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
 	{
 		//stop when you cant move
@@ -316,6 +319,7 @@ public class HUB : MonoBehaviour {
 
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
+	//x and y are in grid space here
 	void findPlacesToSummon(ArrayList characterPos, float range, int x, int y)
 	{
 		//stop when you cant move

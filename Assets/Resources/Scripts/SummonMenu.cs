@@ -100,6 +100,7 @@ public class SummonMenu : MonoBehaviour
 		}
 	}
 
+	//get some input from the user
 	void getInput()
 	{
 		summonOptions[index].GetComponent<SpriteRenderer>().color = Color.green;
@@ -146,7 +147,6 @@ public class SummonMenu : MonoBehaviour
 
 	void SummonCharacter(Character c)
 	{
-		//print("WIP");
 		//set this menu's canMove flag.
 		canMove = false;
 		//set the other can move flags.
@@ -178,6 +178,7 @@ public class SummonMenu : MonoBehaviour
 
 	}
 
+	//sorts both the 'canAfford' and 'cannotAfford' lists in alpha order
 	void sortByName()
 	{
 		canAfford = canAfford.OrderBy(g => g.c.name).ToList();

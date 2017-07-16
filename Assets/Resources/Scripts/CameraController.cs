@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour {
 	private int maxX,minX;
 	private int maxY,minY;
 	private bool childFlag;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -24,6 +25,7 @@ public class CameraController : MonoBehaviour {
 	/*
 	 * Used to move the camera.
 	 * There are bounds on the edges of the map to keep the camera from showing things out of the map
+	 * "pos" here is in World space
 	 */
 	public void moveCamera(Vector3 pos)
 	{

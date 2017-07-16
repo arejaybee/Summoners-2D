@@ -210,6 +210,7 @@ public class Cursor : MonoBehaviour {
 
 
 	//limit the cursor to only move on the map
+	//x and y are in world space
 	void LimitToBounds()
 	{
 		float tempX = transform.position.x;
@@ -259,6 +260,7 @@ public class Cursor : MonoBehaviour {
 	 * This function converts a clicked location into a grid location.
 	 * Note, this function will never be called with the current build. If, later, the program is updated to work with mouse clicks, this function will
 	 * be used to find which square the player clicked on.
+	 * "pos" here is in world space
 	 */
 	public Vector3 RoundPosition(Vector3 pos)
 	{
@@ -304,6 +306,7 @@ public class Cursor : MonoBehaviour {
 		return newPos;
 	}
 
+	//"pos" here is in grid space. 
 	public void MoveTo(Vector2 pos)
 	{
 		transform.position = new Vector2(pos.x * spacer, pos.y * spacer);
