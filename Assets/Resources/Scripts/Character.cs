@@ -100,7 +100,19 @@ public class Character : MonoBehaviour
 			//players get some mana back if their unit dies
 			if (char2.hp <= 0)
 			{
-				GameObject.Find("Summoner" + char2.playerNumber).GetComponent<Summoner>().mana += (int)(char2.cost / 2);
+				switch((int)char2.playerNumber)
+				{
+					case (1):
+						hub.summoner1.mana += char2.cost / 2;
+						break;
+					case (2):
+						hub.summoner2.mana += char2.cost / 2;
+						break;
+					default:
+						print("This should not be hit!");
+						break;
+
+				}
 			}
 			if(char2.hp > 0 && char2.counterAttack)
 			{
@@ -131,7 +143,18 @@ public class Character : MonoBehaviour
 		//players get some mana back if their unit dies
 		if (char2.hp <= 0)
 		{
-			GameObject.Find("Summoner" + char2.playerNumber).GetComponent<Summoner>().mana += (int)(char2.cost / 2);
+			switch ((int)char2.playerNumber)
+			{
+				case (1):
+					hub.summoner1.mana += char2.cost / 2;
+					break;
+				case (2):
+					hub.summoner2.mana += char2.cost / 2;
+					break;
+				default:
+					print("This should not be hit!");
+					break;
+			}
 		}
 	}
 

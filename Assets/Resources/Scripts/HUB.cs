@@ -16,12 +16,12 @@ public class HUB : MonoBehaviour {
 	public MapGenerator mapGenerator;
 	public CameraController cam;
 	public ArrayList characters;
-	public ArrayList characterPositions;
+	public ArrayList characterPositions;//world space coordinates
 	public Summoner summoner1;
 	public Summoner summoner2;
-	public ArrayList enemyPositions;
+	public ArrayList enemyPositions;//grid space coordinates
 	public float spacer;
-	public ArrayList summonPositions;
+	public ArrayList summonPositions;//gird space coordinates
 
 	//Time since the last time these keys were pressed
 	public float lastTimeX;
@@ -35,7 +35,7 @@ public class HUB : MonoBehaviour {
 
 	private ArrayList mapTiles;
 	private ArrayList mapTilePos;
-	private ArrayList moveTilePositions;
+	private ArrayList moveTilePositions;//grid space coordinates
 
 	// Use this for initialization
 	void Start ()
@@ -133,7 +133,7 @@ public class HUB : MonoBehaviour {
 	public bool enemyInRange(Character c)
 	{
 		ArrayList mapPositions = new ArrayList();
-		findEnemies(mapPositions, c.attkRange, c.getIntX(), c.getIntY(), c.playerNumber);
+		findEnemies(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber);
 		for(int i = 0; i < mapPositions.Count; i++)
 		{
 			 if(charaHasSamePlayerNum(((Vector2)mapPositions[i]), c))
@@ -206,7 +206,13 @@ public class HUB : MonoBehaviour {
 		//stop when you cant move
 		if (move <= 0)
 			return;
-		
+
+		//cannot move through characters
+		if (hasMoved && characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
+		{
+			return;
+		}
+
 		//find the map tile at this spot
 		int index = mapTilePos.IndexOf(new Vector2(x, y));
 
@@ -302,6 +308,9 @@ public class HUB : MonoBehaviour {
 				break;
 			case ("EnemyTile"):
 				enemyPositions.Clear();
+				break;
+			default:
+				print("This should not print.");
 				break;
 		}
 	}

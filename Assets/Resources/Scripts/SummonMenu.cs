@@ -156,8 +156,8 @@ public class SummonMenu : MonoBehaviour
 		//make an instance of this character
 		GameObject createdCharacter = (GameObject)GameObject.Instantiate(Resources.Load("Prefab/Characters/Units/" + c.name));
 		createdCharacter.GetComponent<Character>().CreateCharacter();
-		hub.summoner1.mana -= c.cost;
-		Destroy(c);
+		hub.getCurrentSummoner().mana -= c.cost;
+		
 
 		//make tiles showing where they can summon
 		hub.MakeTiles("SummonTile");

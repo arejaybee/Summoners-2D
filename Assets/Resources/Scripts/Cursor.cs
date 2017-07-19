@@ -108,6 +108,7 @@ public class Cursor : MonoBehaviour {
 			{
 				DetectSelect();
 			}
+
 			//if the character hits confirm, check if there is a summon tile, if so, place the unit there
 			else if(summoning)
 			{
@@ -126,7 +127,7 @@ public class Cursor : MonoBehaviour {
 				GoToMoveMenu();
 			}
 		}
-		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f)
+		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f && !summoning)
 		{
 			hub.lastTimeX = Time.time;
 			if (!select)
@@ -162,7 +163,6 @@ public class Cursor : MonoBehaviour {
 				return false;
 		}
 		return ret;
-
 	}
 
 	//Enters the MoveMenu script.
@@ -209,22 +209,30 @@ public class Cursor : MonoBehaviour {
 	void DetectSelect()
 	{
 		Character c = hub.findCharacterAt(transform.position);
-		if (c.playerNumber == turn.playerTurn)
+		//if you hit a character, and you can select something
+		if (c != null && select)
 		{
-			if (c.canMove)
+			//if its that characters turn
+			if (c.playerNumber == turn.playerTurn)
 			{
-				selectedCharacter = c;
-				select = false;
-				charOrgX = selectedCharacter.transform.position.x;
-				charOrgY = selectedCharacter.transform.position.y;
-			}
-			else if (c.name == "Summoner" && hub.canSummon())
-			{
-				cursorCanMove = false;
-				ArrayList list = new ArrayList();
-				list.Add("Summon");
-				Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
-				hub.moveMenuHandler.MakeMoveMenu(list, pos);
+				//if they can still move
+				if (c.canMove)
+				{
+					//select them with the cursor
+					selectedCharacter = c;
+					select = false;
+					charOrgX = selectedCharacter.transform.position.x;
+					charOrgY = selectedCharacter.transform.position.y;
+				}
+				//if theyre a summoner, give them the chance to summon even if they cannot move
+				else if (c.name == "Summoner" && hub.canSummon())
+				{
+					cursorCanMove = false;
+					ArrayList list = new ArrayList();
+					list.Add("Summon");
+					Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
+					hub.moveMenuHandler.MakeMoveMenu(list, pos);
+				}
 			}
 		}
 		if (!select) 
@@ -295,8 +303,7 @@ public class Cursor : MonoBehaviour {
 	/*
 	 * When clicking to move, the position doesnt necessarily stay grid like
 	 * This function converts a clicked location into a grid location.
-	 * Note, this function will never be called with the current build. If, later, the program is updated to work with mouse clicks, this function will
-	 * be used to find which square the player clicked on.
+	 * The function is currently being used to convert gridspace coordinates to world space.
 	 * "pos" here is in world space
 	 */
 	public Vector3 RoundPosition(Vector3 pos)

@@ -22,7 +22,9 @@ public class Turns : MonoBehaviour
 	{
 		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.select)
 		{
-
+			hub.RemoveTiles("SummonTile");
+			hub.RemoveTiles("MoveTile");
+			hub.RemoveTiles("EnemyTile");
 			Character[] chars = FindObjectsOfType<Character>();
 	
 			//proc all of the end of turn abilities
