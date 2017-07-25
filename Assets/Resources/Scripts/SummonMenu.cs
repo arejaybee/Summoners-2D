@@ -163,7 +163,6 @@ public class SummonMenu : MonoBehaviour
 		hub.MakeTiles("SummonTile");
 
 		//put that character onto the cursor
-		print(hub.summonPositions.Count);
 		hub.cursor.MoveTo((Vector2)hub.summonPositions[0]);
 		createdCharacter.transform.position = hub.cursor.transform.position;
 

@@ -73,34 +73,44 @@ public class Character : MonoBehaviour
 	
 	}
 
-    /*
+	/*
      * Precondition: There are two Characters
      * Postcondition: Character2 will lose some health (minimum of 1)
      * Description: This character deals damage to another character. Called whenever this character moves on the board.
      */
-    public virtual void fight(Character char2)
-    {
-        if (char2.playerNumber != 0 && char2.playerNumber != playerNumber)
-        {
-			if (piercing)//with piecing, characters can simply ignore an opponents defence
+	public virtual void fight(Character char2)
+	{
+		//this character hits the other one
+		battle(this, char2);
+
+		//if that character survives it hits back
+		if (char2.hp > 0)
+		{
+			battle(char2, this);
+		}
+	}
+
+	/*
+	 * This function is basically an extension of fight.
+	 * I use this so I can just tell char1 to hit char2 and char2 to hit char1 by calling a single function twice.
+	 */
+	public void battle(Character char1, Character char2)
+	{
+		if (char2.playerNumber != 0 && char2.playerNumber != char1.playerNumber)
+		{
+			if (char1.piercing)//with piecing, characters can simply ignore an opponents defence
 			{
-				char2.hp -= attk;
+				char2.hp -= char1.attk;
 			}
 			else
 			{
-				char2.hp = char2.hp - Mathf.Max(attk - char2.defense, 0); //dont do negative damage, but try to attack!
+				char2.hp = char2.hp - Mathf.Max(char1.attk - char2.defense, 0); //dont do negative damage, but try to attack!
 			}
-            //When a Gorgan is hit by a creature, that creature is stunned for 1 round
-            if(char2.name == "Gorgon" && name != "Gorgon")
-            {
-                stun = 3;
-				canMove = false;
-            }
 
 			//players get some mana back if their unit dies
 			if (char2.hp <= 0)
 			{
-				switch((int)char2.playerNumber)
+				switch ((int)char2.playerNumber)
 				{
 					case (1):
 						hub.summoner1.mana += char2.cost / 2;
@@ -114,49 +124,10 @@ public class Character : MonoBehaviour
 
 				}
 			}
-			if(char2.hp > 0 && char2.counterAttack)
-			{
-				char2.counter(this);
-			}
-		}
-
-    }
-
-	/*
-	 * This is speciffically for units that may attack back
-	 * It is set up nearly the same as fight, but had to be its own function to avoid recursion
-	 */ 
-	public virtual void counter(Character char2)
-	{
-		if (char2.playerNumber != 0)
-		{
-			//char2.hp = char2.hp - Mathf.Max(attk - char2.defense, 1); //original intention is to always do a min of 1 damage
-			char2.hp = char2.hp - Mathf.Max(attk - char2.defense, 0); //dont do negative damage, but try to attack!
-
-			//When a Gorgan is hit by a creature, that creature is stunned for 1 round
-			if (char2.name == "Gorgon" && name != "Gorgon")
-			{
-				stun = 3;
-				canMove = false;
-			}
-		}
-		//players get some mana back if their unit dies
-		if (char2.hp <= 0)
-		{
-			switch ((int)char2.playerNumber)
-			{
-				case (1):
-					hub.summoner1.mana += char2.cost / 2;
-					break;
-				case (2):
-					hub.summoner2.mana += char2.cost / 2;
-					break;
-				default:
-					print("This should not be hit!");
-					break;
-			}
 		}
 	}
+
+
 
 	/*
      * A function to set the playerNum value to either 1 or 2

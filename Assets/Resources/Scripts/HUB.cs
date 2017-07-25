@@ -132,16 +132,17 @@ public class HUB : MonoBehaviour {
 	//if there are any enemies within the range of a character, return true
 	public bool enemyInRange(Character c)
 	{
+		bool flag = false;
 		ArrayList mapPositions = new ArrayList();
 		findEnemies(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber);
 		for(int i = 0; i < mapPositions.Count; i++)
 		{
 			 if(charaHasSamePlayerNum(((Vector2)mapPositions[i]), c))
 			{
-				return true;
+				flag = true;
 			}
 		}
-		return false;
+		return flag;
 	}
 
 	//finds characters at a position and checks if they share a player num with a given palyer number
@@ -155,7 +156,7 @@ public class HUB : MonoBehaviour {
 				if(chars[i].playerNumber != c.playerNumber)
 				{
 					flag = true;
-					enemyPositions.Add((Vector2)chars[i].transform.position);
+					enemyPositions.Add(new Vector2(chars[i].getIntX(),chars[i].getIntY()));
 				}
 			}
 		}
@@ -264,7 +265,7 @@ public class HUB : MonoBehaviour {
 			case ("MoveTile"):
 				length = moveTilePositions.Count;
 				break;
-			case ("AttackTile"):
+			case ("EnemyTile"):
 				length = enemyPositions.Count;
 				break;
 			case ("SummonTile"):
@@ -280,7 +281,7 @@ public class HUB : MonoBehaviour {
 				case ("MoveTile"):
 					obj.transform.position = cursor.RoundPosition((Vector2)moveTilePositions[i] * cursor.spacer);
 					break;
-				case ("AttackTile"):
+				case ("EnemyTile"):
 					obj.transform.position = cursor.RoundPosition((Vector2)enemyPositions[i] * cursor.spacer);
 					break;
 				case ("SummonTile"):

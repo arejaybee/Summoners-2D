@@ -19,6 +19,6 @@ public class Knight : Character
 		cost = 20;
 		canMove = true;
 		counterAttack = true;
-		extraDescription = "\nAttacks back when attacked. Counter deals double.";
+		extraDescription = "\nStrong and sturdy armored units.";
 	}
 }
