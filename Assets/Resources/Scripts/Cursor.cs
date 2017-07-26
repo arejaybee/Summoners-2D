@@ -11,13 +11,14 @@ public class Cursor : MonoBehaviour {
 	public bool cursorCanMove;
 	public bool select;//if this is true, we can pick up a unit
 	public bool summoning;
+	public bool attacking;
 	public Character selectedCharacter;
 	private float orgX, orgY;
 	private float charOrgX, charOrgY;
 	private Character unselectableSummoner;
+	private Character fightingCharacter;
 	HUB hub;
 	Turns turn;
-	private bool mapFlag;
 
 	// Use this for initialization
 	void Start()
@@ -32,12 +33,13 @@ public class Cursor : MonoBehaviour {
 		turn = FindObjectOfType<Turns>();
 		maxX = spacer * (hub.mapGenerator.boundsX - 1);
 		maxY = spacer * (hub.mapGenerator.boundsY - 1);
-		mapFlag = true;
 		summoning = false;
+		attacking = false;
 	}
 	// Update is called once per frame
 	void Update ()
 	{
+	
 		//record the x,y cooridinate the cursor is at currently
 		orgX = transform.position.x;
 		orgY = transform.position.y;
@@ -53,7 +55,8 @@ public class Cursor : MonoBehaviour {
 		//if there is no character selected, the cursor can go anywhere within the map's bounds
 		//If we are summoning, there will also be no limit to where the cursor can move. This was done because
 		//there will be cases where some summon tiles are cut off from the rest, so moving to them will be harder with bounds.
-		if (select || summoning)
+		//I am doing the same thing I did with summoning for attacking. It just makes things easier on my end for now
+		if (select || summoning || attacking)
 		{
 			LimitToBounds();
 		}
@@ -66,45 +69,72 @@ public class Cursor : MonoBehaviour {
 				transform.position = new Vector3(orgX, orgY, 0);
 			}
 		}
+
+
+		//when the cursor switches to attack mode, we need to know which 
+		//character is attacking, but also dont want to move the character.
+		if (attacking)
+		{
+			if (selectedCharacter != null)
+			{
+				selectedCharacter.canMove = false;
+				fightingCharacter = selectedCharacter;
+				selectedCharacter = null;
+			}
+		}
+
+		//move the selected character with the cursor
 		if (selectedCharacter != null)
 		{
 			selectedCharacter.gameObject.transform.position = transform.position;
 		}
-		
+
+
 	}
 
 	//used to move the cursor
 	void DetectMovement()
 	{
+		//mv shows where the cursor has moved to. This is so I can move the camera with the cursor
 		Vector3 mv= new Vector3(0,0,0);
+
 		//Each key only gives input every tenth of a second. This keeps the cursor
 		//moving smoothley
+
+		//up
 		if (Input.GetKey(KeyCode.UpArrow) && Time.time - hub.lastTimeUp >= 0.1f)
 		{
 			hub.lastTimeUp = Time.time;
 			mv = new Vector3(0, spacer, 0);
 		}
+		//down
 		if (Input.GetKey(KeyCode.DownArrow) && Time.time - hub.lastTimeDown >= 0.1f)
 		{
 			hub.lastTimeDown = Time.time;
 			mv = new Vector3(0, -1*spacer, 0);
 		}
+		//right
 		if (Input.GetKey(KeyCode.RightArrow) && Time.time - hub.lastTimeRight >= 0.1f)
 		{
 			hub.lastTimeRight = Time.time;
 			mv = new Vector3(spacer, 0, 0);
 		}
+		//left
 		if (Input.GetKey(KeyCode.LeftArrow) && Time.time - hub.lastTimeLeft >= 0.1f)
 		{
 			hub.lastTimeLeft = Time.time;
 			mv = new Vector3(-1*spacer, 0, 0);
 		}
+		
+		//for confirm and cancel, I wait a bit longer between inputs to help stop the game
+		//from canceling and confirming between menus. Sometimes this can be noticable, but hardly..
 
-		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.5f)
+		//on confirm
+		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.25f)
 		{
 			hub.lastTimeZ = Time.time;
 			//if you have not selected a character, do so
-			if (select && !summoning)
+			if (select && !summoning && !attacking)
 			{
 				DetectSelect();
 			}
@@ -119,7 +149,21 @@ public class Cursor : MonoBehaviour {
 					hub.RemoveTiles("SummonTile");
 					selectedCharacter = null;
 				}
-				//fill later
+			}
+			//if the player is currently trying to select an attack target
+			else if (attacking)
+			{
+				print("The cursor knows you are attacking");
+				print("The enemy pos array has: " + hub.enemyPositions.Count + " size");
+				if(isOnTile("EnemyTile"))
+				{
+					select = true;
+					attacking = false;
+					hub.RemoveTiles("EnemyTile");
+					print(fightingCharacter.name);
+					fightingCharacter.fight(hub.findCharacterAt(transform.position));
+					confirmFromMoveMenu();
+				}
 			}
 			//if you have a character selected, give them options from this point
 			else
@@ -127,17 +171,24 @@ public class Cursor : MonoBehaviour {
 				GoToMoveMenu();
 			}
 		}
-		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f && !summoning)
+
+		//on cancel
+		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.25f && !summoning)
 		{
 			hub.lastTimeX = Time.time;
 			if (!select)
 			{
 				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
 			}
-			selectedCharacter = null;
+			if (selectedCharacter != null)
+			{
+				selectedCharacter = null;
+			}
 			select = true;
-			//remove the move tiles
+
+			//remove the extra tiles
 			hub.RemoveTiles("MoveTile");
+			hub.RemoveTiles("EnemyTile");
 		}
 
 		hub.cam.moveCamera(transform.position+mv);
@@ -157,7 +208,12 @@ public class Cursor : MonoBehaviour {
 				break;
 			case ("MoveTile"):
 				break;
-			case ("AttackTile"):
+			case ("EnemyTile"):
+				if(hub.enemyPositions.Contains(new Vector2(getIntX(), getIntY())))
+				{
+					print("The cursor knows it is on an enemy Tile");
+					ret = true;
+				}
 				break;
 			default:
 				return false;

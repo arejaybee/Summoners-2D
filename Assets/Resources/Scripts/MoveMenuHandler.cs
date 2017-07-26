@@ -146,10 +146,8 @@ public class MoveMenuHandler : MonoBehaviour
 		//create enemy tiles
 		hub.MakeTiles("EnemyTile");
 		//set cursor flag to know it needs to attack
-		//cursor should only confirm if ontop of an enemy tile
-		//on confirm, they battle and then remove all enemy tiles
-		//on cancel return the character to its original x/y and remove all attack tiles
-		hub.cursor.confirmFromMoveMenu();
+		hub.cursor.attacking = true;
+		hub.cursor.cursorCanMove = true;
 		removeMenu();
 		/*for(int i = 0; i < hub.enemyPositions.Count; i++)
 		{

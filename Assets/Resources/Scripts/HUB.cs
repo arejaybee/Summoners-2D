@@ -117,6 +117,7 @@ public class HUB : MonoBehaviour {
 	}
 
 	//given a position, find a character that is at the position
+	//where pos is in world space
 	public Character findCharacterAt(Vector2 pos)
 	{
 		for(int i = 0; i < chars.Length; i++)
