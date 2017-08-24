@@ -11,12 +11,13 @@ public class Fairy : Character {
         name = "Fairy";
         maxHp = 1;
         hp = 1;
-        move = 5;
+        move = 2;
         attkRange = 1;
         attk = 1;
         defense = 0;
         cost = 2;
-        extraDescription = "\n+3 mana per turn";
+        description = "+3 mana per turn";
+		topBarDescription = "These magical creatures will aid their summoner with 3 mana every turn.";
         canMove = true;
     }
 

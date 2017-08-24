@@ -17,11 +17,11 @@ public class Character : MonoBehaviour
     public float playerNumber;
     public new string name;
     public string description;
+	public string topBarDescription;
     public bool canMove = true;
     public int stun = 0;
     public Material theMaterial;
     public int cost;
-    public string extraDescription = "";
 	protected bool piercing;
 	public bool counterAttack;
 	public int speech;
@@ -42,10 +42,7 @@ public class Character : MonoBehaviour
 		speech = 0;
 		loyalty = 0;
         hp = maxHp;
-        description = name + "\n HP: " + hp + "/" + maxHp + "\n Attk: " + attk + " Def: " + defense + "\n Attk Range: " + attkRange + "\n Move: "+move+extraDescription;
-        canMove = true;
-		counterAttack = false;
-		piercing = false;
+		canMove = true;
 		hub = FindObjectOfType<HUB>();
 		spacer = hub.cursor.spacer;
 		iconPath = "Icons/" + name + "Icon";
@@ -59,13 +56,15 @@ public class Character : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        description = name + "\n HP: " + hp + "/" + maxHp + "\n Attk: " + attk + " Def: " + defense + "\n Attk Range: " + attkRange + "\n Move: " + move+extraDescription;
-        if(stun > 0)
+	    if(stun > 0)
         {
             description = description + "\nStun for: " + Mathf.CeilToInt((float)(stun-1) / 2) + " rounds";
         }
     }
-
+	public void runStart()
+	{
+		Start();
+	}
 	public void CreateCharacter()
 	{
 		Start();

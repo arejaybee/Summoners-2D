@@ -71,7 +71,7 @@ public class TopBar : MonoBehaviour
 		//playerNumber
 		playerNum.GetComponent<TextMesh>().text = "Player " + selectedChar.playerNumber;
 		//description
-		description.GetComponent<TextMesh>().text = selectedChar.extraDescription;
+		description.GetComponent<TextMesh>().text = selectedChar.topBarDescription;
 
 		//icon
 		icon.GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);

@@ -28,7 +28,7 @@ public class Summoner : Character {
 		numUnits = 0;
 		mana = 5;
 		base.Start();
-		extraDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
+		description = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
 	protected override void Update()
 	{

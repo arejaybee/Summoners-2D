@@ -205,15 +205,6 @@ public class HUB : MonoBehaviour {
 	//x and y are in grid space
 	public void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
 	{
-		//stop when you cant move
-		if (move <= 0)
-			return;
-
-		//cannot move through characters
-		if (hasMoved && characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
-		{
-			return;
-		}
 
 		//find the map tile at this spot
 		int index = mapTilePos.IndexOf(new Vector2(x, y));
@@ -229,6 +220,18 @@ public class HUB : MonoBehaviour {
 		{
 			cost = 0;
 		}
+
+		//stop when you cant move
+		if (move-cost < 0)
+			return;
+
+		//cannot move through characters
+		if (hasMoved && characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
+		{
+			return;
+		}
+
+	
 		
 		//dont overlap positions
 		if (!moveTilePositions.Contains(new Vector2(x, y)))

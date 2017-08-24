@@ -7,7 +7,8 @@ using System.Linq;
 public class SummonMenu : MonoBehaviour
 {
 	public Character selectedChar;
-	public Object[] characters;
+	public Object[] characterObjects;
+	public Character[] characters;
 	public List<SummonOption> summonOptions;
 	public HUB hub;
 	//this will make things easier for the player
@@ -21,13 +22,24 @@ public class SummonMenu : MonoBehaviour
 	{
 		canMove = false;
 		hub = GameObject.FindObjectOfType<HUB>();
-		characters = Resources.LoadAll("Prefab/Characters/Units");
+		characterObjects = Resources.LoadAll("Prefab/Characters/Units");
+
+		characters = new Character[characterObjects.Length];//set the character array to the same size as the number of objects
+		for(int i = 0; i < characterObjects.Length; i++)
+		{
+			GameObject obj = GameObject.Instantiate((GameObject)characterObjects[i]);
+			characters[i] = obj.GetComponent<Character>();
+			characters[i].runStart();//to get values specified in the "start" function
+			GameObject.Destroy(obj);
+		}
 		index = 0;
 		summonOptions = new List<SummonOption>();
 		for(int i = 0; i < characters.Length; i++)
 		{
+			//summonOptions.Add(new SummonOption());
 			summonOptions.Add(((GameObject)(GameObject.Instantiate(Resources.Load("Prefab/SummonMenu/SummonMenuOption")))).GetComponent<SummonOption>());
-			summonOptions[i].c = ((GameObject)characters[i]).GetComponent<Character>();
+			summonOptions[i].c = characters[i];// ((GameObject)characters[i]).GetComponent<Character>();
+			summonOptions[i].Start();
 		}
 	}
 	
@@ -51,9 +63,8 @@ public class SummonMenu : MonoBehaviour
 	 */ 
 	void fillStatPortion()
 	{
-		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\nSPCH: "+ summonOptions[index].c .speech+ "\t\tLOY: "+ summonOptions[index].c.loyalty+ "\n"+summonOptions[index].c.extraDescription+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+hub.getCurrentSummoner().mana;
+		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\nSPCH: "+ summonOptions[index].c .speech+ "\t\tLOY: "+ summonOptions[index].c.loyalty+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+hub.getCurrentSummoner().mana;
 		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
-		//print(selectedChar.iconPath);
 		GameObject.Find("StatDisplay").transform.FindChild("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
 	}
 
@@ -69,10 +80,12 @@ public class SummonMenu : MonoBehaviour
 		{
 			if(summonOptions[i].c.cost > hub.getCurrentSummoner().mana)
 			{
+				summonOptions[i].GetComponent<SpriteRenderer>().color = Color.black;
 				cannotAfford.Add(summonOptions[i]);
 			}
 			else
 			{
+				summonOptions[i].GetComponent<SpriteRenderer>().color = Color.white;
 				canAfford.Add(summonOptions[i]);
 			}
 		}
@@ -90,12 +103,28 @@ public class SummonMenu : MonoBehaviour
 		{
 			summonOptions.Add(cannotAfford[i]);
 		}
-		//NOW WE FINALLY MAKE THESE STUPID OPTION OBJECTS
 		for(int i = 0; i < summonOptions.Count; i++)
+		{
+			summonOptions[i].transform.position = new Vector3(-999, -999, -999);
+		}
+		int start = 0;
+		int end = 5;
+		if(index - 4 > 0)
+		{
+			start = index - 4;
+			end = index+1;
+		}
+		else if(index < start && index >= 0)
+		{
+			start = index;
+			end = index + 5;
+		}
+		//NOW WE FINALLY MAKE THESE STUPID OPTION OBJECTS
+		for(int i = start; i < end; i++)
 		{
 			//for now these are hard coded, because their positions are pretty much statically based on the position of this first one, which is pretty much statically
 			//based on the position of the menu, WHICH Im pretty sure is just gonna stay where it is.
-			summonOptions[i].transform.position = new Vector3(-513.4f,(6.6f - 3.84f*i),-1f);
+			summonOptions[i].transform.position = new Vector3(-513.4f,(6.6f - 3.84f*(i-start)),-1f);
 			summonOptions[i].transform.localScale = new Vector3(41.72f, 6, 1);
 		}
 	}
