@@ -24,8 +24,7 @@ public class Character : MonoBehaviour
     public int cost;
 	protected bool piercing;
 	public bool counterAttack;
-	public int speech;
-	public int loyalty;
+	public int zeal;
 	public string iconPath;
 	//literally just to size/space based on cursor size
 	public HUB hub;
@@ -39,8 +38,7 @@ public class Character : MonoBehaviour
             maxHp = 1;
             hp = 1;
         }
-		speech = 0;
-		loyalty = 0;
+		zeal = 0;
         hp = maxHp;
 		canMove = true;
 		hub = FindObjectOfType<HUB>();

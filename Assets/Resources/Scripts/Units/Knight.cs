@@ -12,6 +12,7 @@ public class Knight : Character
 		name = "Knight";
 		maxHp = 10;
 		hp = 10;
+		zeal = 50;
 		move = 3;
 		attkRange = 1;
 		attk = 4;

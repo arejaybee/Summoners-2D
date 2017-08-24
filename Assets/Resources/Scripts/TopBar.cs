@@ -67,7 +67,7 @@ public class TopBar : MonoBehaviour
 		//name
 		name.GetComponent<TextMesh>().text = selectedChar.name;
 		//stats
-		stats.GetComponent<TextMesh>().text = "   ATK: "+selectedChar.attk + "\tRNG: " + selectedChar.attkRange + "\n   DEF: " + selectedChar.defense + "\tMOV: " + selectedChar.move+"\nSPCH: "+selectedChar.speech+"\tLOY : "+selectedChar.loyalty;
+		stats.GetComponent<TextMesh>().text = "   ATK: " + selectedChar.attk + "\tRNG: " + selectedChar.attkRange + "\n   DEF: " + selectedChar.defense + "\tMOV: " + selectedChar.move + "\n\t\tZEAL: " + selectedChar.zeal;
 		//playerNumber
 		playerNum.GetComponent<TextMesh>().text = "Player " + selectedChar.playerNumber;
 		//description

@@ -15,6 +15,7 @@ public class Pegasus : Character
 		attk = 5;
 		defense = 0;
 		cost = 15;
+		zeal = 20;
 		canMove = true;
 		description = "Mobile units with\nno movement costs";
 		topBarDescription = "Winged horses that are able to move incredible distances.\n move over water and mountains for free";//(need to implement different costs for tile movements)

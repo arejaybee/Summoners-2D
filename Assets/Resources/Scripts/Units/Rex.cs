@@ -15,6 +15,7 @@ public class Rex : Character {
 		attk = 10;
 		defense = 2;
 		cost = 50;
+		zeal = 10;
 		canMove = true;
 		description = "King of dinosaurs!";
 		topBarDescription = "King of all dinosaures; the T-rex will crush your foes.";

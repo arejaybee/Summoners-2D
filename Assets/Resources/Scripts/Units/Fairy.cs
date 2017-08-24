@@ -9,6 +9,7 @@ public class Fairy : Character {
     {
 		base.Start();
         name = "Fairy";
+		zeal = 99;
         maxHp = 1;
         hp = 1;
         move = 2;

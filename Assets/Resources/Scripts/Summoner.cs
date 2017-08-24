@@ -15,6 +15,7 @@ public class Summoner : Character {
 	{
 		
 		name = "Summoner";
+		zeal = 100;
 		maxHp = 25;
 		hp = maxHp;
 		move = 3;
@@ -28,7 +29,7 @@ public class Summoner : Character {
 		numUnits = 0;
 		mana = 5;
 		base.Start();
-		description = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
+		topBarDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
 	protected override void Update()
 	{

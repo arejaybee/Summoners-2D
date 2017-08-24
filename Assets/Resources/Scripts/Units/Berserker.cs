@@ -16,6 +16,7 @@ public class Berserker : Character
 		attk = 8;
 		defense = 0;
 		cost = 20;
+		zeal = 10;
 		canMove = true;
 		description = "Strong axe loving murderers.";
 		topBarDescription = "These powerful juggernauts destroy anything in their path.";
