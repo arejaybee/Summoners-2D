@@ -82,7 +82,7 @@ public class MoveMenuHandler : MonoBehaviour
 				//removeMenu();
 				break;
 			case ("Speak"):
-				removeMenu();
+				beginSpeaking();
 				break;
 			case ("Summon"):
 				//removeMenu();
@@ -149,9 +149,18 @@ public class MoveMenuHandler : MonoBehaviour
 		hub.cursor.attacking = true;
 		hub.cursor.cursorCanMove = true;
 		removeMenu();
-		/*for(int i = 0; i < hub.enemyPositions.Count; i++)
+	}
+	public void beginSpeaking()
+	{
+		for(int i = 0; i < hub.charsInRange.Count; i++)
 		{
-			hub.cursor.selectedCharacter.fight(hub.findCharacterAt((Vector2)hub.enemyPositions[i]));
-		}*/
+			if(((Character)hub.charsInRange[i]).name != "Summoner")
+			{
+				hub.cursor.selectedCharacter.speak((Character)hub.charsInRange[i]);
+			}
+		}
+		hub.cursor.cursorCanMove = true;
+		hub.cursor.confirmFromMoveMenu();
+		removeMenu();
 	}
 }

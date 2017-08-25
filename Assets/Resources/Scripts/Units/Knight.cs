@@ -12,15 +12,15 @@ public class Knight : Character
 		name = "Knight";
 		maxHp = 10;
 		hp = 10;
-		zeal = 50;
+		zeal = 25;
 		move = 3;
 		attkRange = 1;
 		attk = 4;
-		defense = 2;
+		defense = 1;
 		cost = 5;
 		canMove = true;
-		counterAttack = true;
-		description = "Strong and sturdy\nArmored units.";
-		topBarDescription = "Durable masters of the sword. They are as loyal as they are expendable.";
+		canUseZeal = true;
+		description = "Strong and sturdy\nAnd able to use zeal";
+		topBarDescription = "These durable masters of the sword are as loyal.\nThese units can use their words as often as their swords";
 	}
 }

@@ -22,6 +22,7 @@ public class HUB : MonoBehaviour {
 	public ArrayList enemyPositions;//grid space coordinates
 	public float spacer;
 	public ArrayList summonPositions;//gird space coordinates
+	public ArrayList charsInRange;
 
 	//Time since the last time these keys were pressed
 	public float lastTimeX;
@@ -56,6 +57,7 @@ public class HUB : MonoBehaviour {
 		Summoner[] s = FindObjectsOfType<Summoner>();
 		enemyPositions = new ArrayList();
 		summonPositions = new ArrayList();
+		charsInRange = new ArrayList();
 
 		if(s[0].playerNumber == 1)
 		{
@@ -135,10 +137,10 @@ public class HUB : MonoBehaviour {
 	{
 		bool flag = false;
 		ArrayList mapPositions = new ArrayList();
-		findEnemies(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber);
+		findCharacters(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber);
 		for(int i = 0; i < mapPositions.Count; i++)
 		{
-			 if(charaHasSamePlayerNum(((Vector2)mapPositions[i]), c))
+			 if(charaHasDifferentPlayerNum(((Vector2)mapPositions[i]), c))
 			{
 				flag = true;
 			}
@@ -146,8 +148,26 @@ public class HUB : MonoBehaviour {
 		return flag;
 	}
 
+	//if there are any characters within the range of a character, return true
+	public ArrayList charactersInRange(Character c)
+	{
+		ArrayList mapPositions = new ArrayList();
+		findCharacters(mapPositions, c.attkRange + 1, c.getIntX(), c.getIntY(), c.playerNumber);
+
+		charsInRange.Clear();
+		for(int i = 0; i < chars.Length; i++)
+		{
+			if (chars[i] != c && chars[i].name != "Summoner" && mapPositions.Contains(new Vector2(chars[i].getIntX(), chars[i].getIntY())))
+			{
+				charsInRange.Add(chars[i]);
+			}
+		}
+
+		return charsInRange;
+	}
+
 	//finds characters at a position and checks if they share a player num with a given palyer number
-	bool charaHasSamePlayerNum(Vector2 pos, Character c)
+	bool charaHasDifferentPlayerNum(Vector2 pos, Character c)
 	{
 		bool flag = false;
 		for(int i = 0; i < chars.Length; i++)
@@ -167,7 +187,7 @@ public class HUB : MonoBehaviour {
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
 	//x and y here are in grid space
-	void findEnemies(ArrayList characterPos, float range, int x, int y, float playerNumber)
+	void findCharacters(ArrayList characterPos, float range, int x, int y, float playerNumber)
 	{
 		//stop when you cant move
 		if (range <= 0)
@@ -184,19 +204,19 @@ public class HUB : MonoBehaviour {
 		//move up,left,right,down
 		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
 		{
-			findEnemies(characterPos,range-1, x, y + 1, playerNumber);
+			findCharacters(characterPos,range-1, x, y + 1, playerNumber);
 		}
 		if (x - 1 >= 0)
 		{
-			findEnemies(characterPos, range-1, x - 1, y, playerNumber);
+			findCharacters(characterPos, range-1, x - 1, y, playerNumber);
 		}
 		if (x + 1 <= realRound(cursor.maxX / cursor.spacer))
 		{
-			findEnemies(characterPos, range-1, x + 1, y, playerNumber);
+			findCharacters(characterPos, range-1, x + 1, y, playerNumber);
 		}
 		if (y - 1 >= 0)
 		{
-			findEnemies(characterPos, range-1, x, y - 1, playerNumber);
+			findCharacters(characterPos, range-1, x, y - 1, playerNumber);
 		}
 	}
 

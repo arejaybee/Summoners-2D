@@ -14,17 +14,17 @@ public class Character : MonoBehaviour
     public float attk;
     public float defense;
     public int move;
-    public float playerNumber;
+	public int zeal;
+	public float playerNumber;
     public new string name;
     public string description;
 	public string topBarDescription;
     public bool canMove = true;
+	public bool canUseZeal = false;
     public int stun = 0;
     public Material theMaterial;
     public int cost;
 	protected bool piercing;
-	public bool counterAttack;
-	public int zeal;
 	public string iconPath;
 	//literally just to size/space based on cursor size
 	public HUB hub;
@@ -54,11 +54,20 @@ public class Character : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-	    if(stun > 0)
-        {
-            description = description + "\nStun for: " + Mathf.CeilToInt((float)(stun-1) / 2) + " rounds";
-        }
-    }
+		//if your zeal drops below 0, you swap teams
+		if (zeal < 0)
+		{
+			if(playerNumber == 1)
+			{
+				playerNumber = 2;
+			}
+			else
+			{
+				playerNumber = 1;
+			}
+			zeal *= -1;
+		}
+	}
 	public void runStart()
 	{
 		Start();
@@ -124,7 +133,17 @@ public class Character : MonoBehaviour
 		}
 	}
 
-
+	public void speak(Character c2)
+	{
+		if (c2.playerNumber != playerNumber)
+		{
+			c2.zeal -= (int)(zeal / 5);
+		}
+		else
+		{
+			c2.zeal += (int)(zeal / 5);
+		}
+	}
 
 	/*
      * A function to set the playerNum value to either 1 or 2

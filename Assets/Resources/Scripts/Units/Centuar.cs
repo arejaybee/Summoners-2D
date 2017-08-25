@@ -15,7 +15,7 @@ public class Centuar : Character {
 		attk = 3;
 		defense = 0;
 		cost = 7;
-		zeal = 20;
+		zeal = 15;
 		piercing = true;
 		description = "Mobile range units\nThat can pierce defences";
 		topBarDescription = "This beast is able to move around quickly.\nWith their trusty bows they strike at a distance.";

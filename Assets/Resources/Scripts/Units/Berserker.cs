@@ -9,8 +9,8 @@ public class Berserker : Character
 	{
 		base.Start();
 		name = "Berserker";
-		maxHp = 10;
-		hp = 10;
+		maxHp = 15;
+		hp = 15;
 		move = 3;
 		attkRange = 1;
 		attk = 8;

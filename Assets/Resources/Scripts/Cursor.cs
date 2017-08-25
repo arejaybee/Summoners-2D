@@ -153,14 +153,12 @@ public class Cursor : MonoBehaviour {
 			//if the player is currently trying to select an attack target
 			else if (attacking)
 			{
-				print("The cursor knows you are attacking");
-				print("The enemy pos array has: " + hub.enemyPositions.Count + " size");
 				if(isOnTile("EnemyTile"))
 				{
 					select = true;
 					attacking = false;
 					hub.RemoveTiles("EnemyTile");
-					print(fightingCharacter.name);
+					//print(fightingCharacter.name);
 					fightingCharacter.fight(hub.findCharacterAt(transform.position));
 					confirmFromMoveMenu();
 				}
@@ -234,6 +232,10 @@ public class Cursor : MonoBehaviour {
 		if(hub.enemyInRange(selectedCharacter))
 		{
 			list.Add("Attack");
+		}
+		if(selectedCharacter.canUseZeal && hub.charactersInRange(selectedCharacter).Count > 0)
+		{
+			list.Add("Speak");
 		}
 		//add Speak
 		//add Heal
