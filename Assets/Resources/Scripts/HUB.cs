@@ -132,6 +132,21 @@ public class HUB : MonoBehaviour {
 		return null;
 	}
 
+	/*
+	 * Given a character, returns all characters that share a position with it (this should be 0)
+	 */ 
+	public ArrayList findCharactersOn(Character c)
+	{
+		ArrayList charactersToReturn = new ArrayList();
+		for (int i = 0; i < chars.Length; i++)
+		{
+			if (chars[i] != c && chars[i].getIntX() == c.getIntX() && chars[i].getIntY() == c.getIntY())
+			{
+				charactersToReturn.Add(chars[i]);
+			}
+		}
+		return charactersToReturn;
+	}
 	//if there are any enemies within the range of a character, return true
 	public bool enemyInRange(Character c)
 	{
@@ -245,8 +260,10 @@ public class HUB : MonoBehaviour {
 		if (move-cost < 0)
 			return;
 
-		//cannot move through characters
-		if (hasMoved && characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
+		Vector2 worldSpaceLoc = cursor.RoundPosition(new Vector2(x * spacer, y * spacer));
+	
+		//if there is a character on this square that is not your ally, you cannotmove there.
+		if (hasMoved && characterPositions.Contains(worldSpaceLoc) && findCharacterAt(worldSpaceLoc).isAllyTo(charToMove))
 		{
 			return;
 		}

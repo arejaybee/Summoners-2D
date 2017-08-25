@@ -7,8 +7,8 @@ public class Berserker : Character
 	// Use this for initialization
 	protected override void Start ()
 	{
-		base.Start();
 		name = "Berserker";
+		base.Start();
 		maxHp = 15;
 		hp = 15;
 		move = 3;

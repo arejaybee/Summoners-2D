@@ -17,6 +17,8 @@ public class SummonMenu : MonoBehaviour
 	public bool canMove;
 
 	private int index;
+	private int startList;
+	private int endList;
 	// Use this for initialization
 	void Start ()
 	{
@@ -33,6 +35,8 @@ public class SummonMenu : MonoBehaviour
 			GameObject.Destroy(obj);
 		}
 		index = 0;
+		startList = 0;
+		endList = 5;
 		summonOptions = new List<SummonOption>();
 		for(int i = 0; i < characters.Length; i++)
 		{
@@ -52,7 +56,7 @@ public class SummonMenu : MonoBehaviour
 			fillStatPortion();
 
 			separateLists();//separate your list of characters into 2 lists
-			sortByName();//sort those two lists
+			sortByCost();//sort those two lists
 			combineLists();//bring those lists back together
 			getInput();//see if the player wanted to move up/down the list
 		}
@@ -94,6 +98,8 @@ public class SummonMenu : MonoBehaviour
 	//you take those two lists and put them back together. CanAfford is added first because you want to see those first.
 	void combineLists()
 	{
+		//we add all of the options we can afford, first then the ones we cannot. Set them all to some far off location, then bring the ones that need to be on screen
+		//onto the screen.
 		summonOptions.Clear();
 		for(int i = 0; i < canAfford.Count; i++)
 		{
@@ -107,24 +113,25 @@ public class SummonMenu : MonoBehaviour
 		{
 			summonOptions[i].transform.position = new Vector3(-999, -999, -999);
 		}
-		int start = 0;
-		int end = 5;
-		if(index - 4 > 0)
+
+		//these 2 while loops will cycle the summon options as the index moves up and down
+		while(index > endList-1)
 		{
-			start = index - 4;
-			end = index+1;
+			startList += 1;
+			endList += 1;
 		}
-		else if(index < start && index >= 0)
+		while(index  < startList)
 		{
-			start = index;
-			end = index + 5;
+			startList -= 1;
+			endList -= 1;
 		}
+		
 		//NOW WE FINALLY MAKE THESE STUPID OPTION OBJECTS
-		for(int i = start; i < end; i++)
+		for(int i = startList; i < endList; i++)
 		{
 			//for now these are hard coded, because their positions are pretty much statically based on the position of this first one, which is pretty much statically
 			//based on the position of the menu, WHICH Im pretty sure is just gonna stay where it is.
-			summonOptions[i].transform.position = new Vector3(-513.4f,(6.6f - 3.84f*(i-start)),-1f);
+			summonOptions[i].transform.position = new Vector3(-513.4f,(6.6f - 3.84f*(i-startList)),-1f);
 			summonOptions[i].transform.localScale = new Vector3(41.72f, 6, 1);
 		}
 	}
@@ -226,6 +233,7 @@ public class SummonMenu : MonoBehaviour
 	//Below this line, I hope to fill a bunch of sort options (currently only going to sort by name)
 	void sortByCost()
 	{
-
+		canAfford = canAfford.OrderBy(g => g.c.cost).ToList();
+		cannotAfford = cannotAfford.OrderBy(g => g.c.cost).ToList();
 	}
 }

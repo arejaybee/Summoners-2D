@@ -201,6 +201,15 @@ public class Character : MonoBehaviour
 		return (int)f;
 	}
 
+	public bool isAllyTo(Character c)
+	{
+		if(c.playerNumber == playerNumber)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	//if this comes up, returns the color of a unit (This is from an early build, but may still be useful)
 	public Color getPlayerColor()
 	{

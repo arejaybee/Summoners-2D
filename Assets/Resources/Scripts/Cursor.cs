@@ -133,6 +133,7 @@ public class Cursor : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.25f)
 		{
 			hub.lastTimeZ = Time.time;
+
 			//if you have not selected a character, do so
 			if (select && !summoning && !attacking)
 			{
@@ -187,6 +188,7 @@ public class Cursor : MonoBehaviour {
 			//remove the extra tiles
 			hub.RemoveTiles("MoveTile");
 			hub.RemoveTiles("EnemyTile");
+			hub.RemoveTiles("SummonTile");
 		}
 
 		hub.cam.moveCamera(transform.position+mv);
@@ -224,25 +226,36 @@ public class Cursor : MonoBehaviour {
 	void GoToMoveMenu()
 	{
 		ArrayList list = new ArrayList();
+		//if you are a summoner and can summon, you get the summon option
 		if (selectedCharacter.name.Contains("Summoner") && hub.canSummon())
 		{
 			list.Add("Summon");
 		}
-		//add Attack
+		//if there are enemies within your attack range, you get the attack option
 		if(hub.enemyInRange(selectedCharacter))
 		{
 			list.Add("Attack");
 		}
-		if(selectedCharacter.canUseZeal && hub.charactersInRange(selectedCharacter).Count > 0)
+		//if there are units around to hear you, you get the speak option
+		if (selectedCharacter.canUseZeal && hub.charactersInRange(selectedCharacter).Count > 0)
 		{
 			list.Add("Speak");
 		}
-		//add Speak
 		//add Heal
-		list.Add("Stop");
-		cursorCanMove = false;
-		Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
-		hub.moveMenuHandler.MakeMoveMenu(list, pos);
+
+		//you can only stop if there are no characters on the spot you are on.
+		if (hub.findCharactersOn(selectedCharacter).Count == 0)
+		{
+			list.Add("Stop");
+		}
+
+		//It may be that no options were added, in which case, pretend we never hit this function
+		if (list.Count != 0)
+		{
+			cursorCanMove = false;
+			Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
+			hub.moveMenuHandler.MakeMoveMenu(list, pos);
+		}
 	}
 
 	//this is set up to be called from the moveMenu so that this stuff is only set IF they confirm.

@@ -7,8 +7,8 @@ public class Fairy : Character {
 	// Use this for initialization
 	protected override void Start ()
     {
+		name = "Fairy";
 		base.Start();
-        name = "Fairy";
 		zeal = 99;
         maxHp = 1;
         hp = 1;
