@@ -209,7 +209,7 @@ public class SummonMenu : MonoBehaviour
 			hub.cursor.selectedCharacter = null;
 		}
 		//assign the cursor to the character
-		hub.cursor.select = false;
+		hub.cursor.canSelect = false;
 		hub.cursor.summoning = true;
 		hub.cursor.selectedCharacter = createdCharacter.GetComponent<Character>();
 		//let Confirm button place the character and delete the tiles(done in cursor)

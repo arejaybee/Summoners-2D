@@ -15,7 +15,7 @@ public class HUB : MonoBehaviour {
 	public MoveMenuHandler moveMenuHandler;
 	public MapGenerator mapGenerator;
 	public CameraController cam;
-	public ArrayList characters;
+	public ArrayList characters; //an arraylist of all of the characters
 	public ArrayList characterPositions;//world space coordinates
 	public Summoner summoner1;
 	public Summoner summoner2;
@@ -31,7 +31,6 @@ public class HUB : MonoBehaviour {
 	public float lastTimeRight;
 	public float lastTimeUp;
 	public float lastTimeLeft;
-	Character[] chars;
 
 
 	private ArrayList mapTiles;
@@ -89,11 +88,11 @@ public class HUB : MonoBehaviour {
 	{
 		characterPositions.Clear();
 		characters.Clear();
-		chars = GameObject.FindObjectsOfType<Character>();
+		Character[] chars = GameObject.FindObjectsOfType<Character>();
 		for(int i = 0; i < chars.Length; i++)
 		{
 			characters.Add((Character)chars[i]);
-			characterPositions.Add(cursor.RoundPosition(chars[i].transform.position));
+			characterPositions.Add(roundPosition(chars[i].transform.position));
 			//get context of the summoners (if they werent found yet)
 			if(chars[i].name == "Summoner" && chars[i].playerNumber == 1)
 				{
@@ -122,12 +121,16 @@ public class HUB : MonoBehaviour {
 	//where pos is in world space
 	public Character findCharacterAt(Vector2 pos)
 	{
-		for(int i = 0; i < chars.Length; i++)
+		pos = roundPosition(pos);
+		print("My position is: " + pos);
+		print("The characters are at: ");
+		for(int i = 0; i < characterPositions.Count; i++)
 		{
-			if(chars[i].getIntX() == realRound(pos.x/spacer) && chars[i].getIntY() == realRound(pos.y/spacer))
-			{
-				return chars[i];
-			}
+
+		}
+		if(characterPositions.Contains(pos))
+		{
+			return (Character)characters[characterPositions.IndexOf(pos)];
 		}
 		return null;
 	}
@@ -138,24 +141,34 @@ public class HUB : MonoBehaviour {
 	public ArrayList findCharactersOn(Character c)
 	{
 		ArrayList charactersToReturn = new ArrayList();
-		for (int i = 0; i < chars.Length; i++)
+		for (int i = 0; i < characters.Count; i++)
 		{
-			if (chars[i] != c && chars[i].getIntX() == c.getIntX() && chars[i].getIntY() == c.getIntY())
+			//if the is a character that isnt c
+			if ((Character)characters[i] != c)
 			{
-				charactersToReturn.Add(chars[i]);
+				//if it occupies the same place as c
+				if ((Vector2)characterPositions[i] == roundPosition(new Vector2(c.getIntX(), c.getIntY())))
+				{
+					charactersToReturn.Add((Character)characters[i]);
+				}
 			}
 		}
 		return charactersToReturn;
 	}
+
 	//if there are any enemies within the range of a character, return true
 	public bool enemyInRange(Character c)
 	{
 		bool flag = false;
 		ArrayList mapPositions = new ArrayList();
-		findCharacters(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber);
+
+		//fill mapPositions with positions of all characters within the range
+		findCharacters(mapPositions, c.attkRange+1, c.getIntX(), c.getIntY(), c.playerNumber); 
+
+		//fills in the enemyPositions global variable when used. also sets a flag to let the "attack" option show
 		for(int i = 0; i < mapPositions.Count; i++)
 		{
-			 if(charaHasDifferentPlayerNum(((Vector2)mapPositions[i]), c))
+			if(findCharactersWithDifferentPlayerNumber(((Vector2)mapPositions[i]), c))
 			{
 				flag = true;
 			}
@@ -164,36 +177,41 @@ public class HUB : MonoBehaviour {
 	}
 
 	//if there are any characters within the range of a character, return true
+	//This is used for "speak" so I excluded Summoner explicitly
 	public ArrayList charactersInRange(Character c)
 	{
 		ArrayList mapPositions = new ArrayList();
 		findCharacters(mapPositions, c.attkRange + 1, c.getIntX(), c.getIntY(), c.playerNumber);
 
 		charsInRange.Clear();
-		for(int i = 0; i < chars.Length; i++)
+		for(int i = 0; i < characters.Count; i++)
 		{
-			if (chars[i] != c && chars[i].name != "Summoner" && mapPositions.Contains(new Vector2(chars[i].getIntX(), chars[i].getIntY())))
+			Character chara = (Character)characters[i];
+
+			//if the character isnt c, isnt a summoner, and was within the range of findCharacters
+			if (chara != c && chara.name != "Summoner" && mapPositions.Contains(new Vector2(chara.getIntX(), chara.getIntY()) ))
 			{
-				charsInRange.Add(chars[i]);
+				charsInRange.Add(chara);
 			}
 		}
-
 		return charsInRange;
 	}
 
 	//finds characters at a position and checks if they share a player num with a given palyer number
-	bool charaHasDifferentPlayerNum(Vector2 pos, Character c)
+	bool findCharactersWithDifferentPlayerNumber(Vector2 pos, Character c)
 	{
 		bool flag = false;
-		for(int i = 0; i < chars.Length; i++)
+		//find the character at the given position
+		Character chara = findCharacterAt(gridToWorld(pos));
+
+		//if there was a character
+		if (chara != null)
 		{
-			if(chars[i].getIntX() == pos.x && chars[i].getIntY() == pos.y)
+			//see if its an enemy
+			if (chara.playerNumber != c.playerNumber)
 			{
-				if(chars[i].playerNumber != c.playerNumber)
-				{
-					flag = true;
-					enemyPositions.Add(new Vector2(chars[i].getIntX(),chars[i].getIntY()));
-				}
+				flag = true;
+				enemyPositions.Add(new Vector2(chara.getIntX(), chara.getIntY()));
 			}
 		}
 		return flag;
@@ -204,20 +222,22 @@ public class HUB : MonoBehaviour {
 	//x and y here are in grid space
 	void findCharacters(ArrayList characterPos, float range, int x, int y, float playerNumber)
 	{
+		Vector2 pos = new Vector2(x, y);
+
 		//stop when you cant move
 		if (range <= 0)
 			return;
 
 		//dont overlap positions
-		if (!characterPos.Contains(new Vector2(x, y)))
+		if (!characterPos.Contains(pos))
 		{
 			//iif so, add this postion for spawning
-			characterPos.Add(new Vector2(x, y));
+			characterPos.Add(pos);
 		}
 
 
 		//move up,left,right,down
-		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
+		if (y + 1 <= realRound(cursor.maxY / spacer))
 		{
 			findCharacters(characterPos,range-1, x, y + 1, playerNumber);
 		}
@@ -225,7 +245,7 @@ public class HUB : MonoBehaviour {
 		{
 			findCharacters(characterPos, range-1, x - 1, y, playerNumber);
 		}
-		if (x + 1 <= realRound(cursor.maxX / cursor.spacer))
+		if (x + 1 <= realRound(cursor.maxX / spacer))
 		{
 			findCharacters(characterPos, range-1, x + 1, y, playerNumber);
 		}
@@ -240,9 +260,10 @@ public class HUB : MonoBehaviour {
 	//x and y are in grid space
 	public void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
 	{
+		Vector2 pos = new Vector2(x, y);
 
 		//find the map tile at this spot
-		int index = mapTilePos.IndexOf(new Vector2(x, y));
+		int index = mapTilePos.IndexOf(pos);
 
 		//calculate cost to move their
 		int cost;
@@ -260,7 +281,7 @@ public class HUB : MonoBehaviour {
 		if (move-cost < 0)
 			return;
 
-		Vector2 worldSpaceLoc = cursor.RoundPosition(new Vector2(x * spacer, y * spacer));
+		Vector2 worldSpaceLoc = (gridToWorld(pos));
 	
 		//if there is a character on this square that is not your ally, you cannotmove there.
 		if (hasMoved && characterPositions.Contains(worldSpaceLoc) && findCharacterAt(worldSpaceLoc).isAllyTo(charToMove))
@@ -271,14 +292,14 @@ public class HUB : MonoBehaviour {
 	
 		
 		//dont overlap positions
-		if (!moveTilePositions.Contains(new Vector2(x, y)))
+		if (!moveTilePositions.Contains(pos))
 		{
 			//add this postion for spawning
-			moveTilePositions.Add(new Vector2(x, y));
+			moveTilePositions.Add(pos);
 		}
 		
 		//move up,left,right,down
-		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
+		if (y + 1 <= realRound(cursor.maxY / spacer))
 		{
 
 			FindMoveTile(move - cost, x, y + 1, charToMove, true);
@@ -320,13 +341,13 @@ public class HUB : MonoBehaviour {
 			switch (name)
 			{
 				case ("MoveTile"):
-					obj.transform.position = cursor.RoundPosition((Vector2)moveTilePositions[i] * cursor.spacer);
+					obj.transform.position = gridToWorld((Vector2)moveTilePositions[i]);
 					break;
 				case ("EnemyTile"):
-					obj.transform.position = cursor.RoundPosition((Vector2)enemyPositions[i] * cursor.spacer);
+					obj.transform.position = gridToWorld((Vector2)enemyPositions[i]); 
 					break;
 				case ("SummonTile"):
-					obj.transform.position = cursor.RoundPosition((Vector2)summonPositions[i] * cursor.spacer);
+					obj.transform.position = gridToWorld((Vector2)summonPositions[i]);
 					break;
 			}
 		}
@@ -359,6 +380,12 @@ public class HUB : MonoBehaviour {
 
 	public bool canSummon()
 	{
+		//must have the minimum mana to summon a unit
+		if(getCurrentSummoner().mana < 2)
+		{
+			return false;
+		}
+		//must be places in range to summon to.
 		findPlacesToSummon(summonPositions,getCurrentSummoner().summonRange,getCurrentSummoner().getIntX(), getCurrentSummoner().getIntY());
 		if(summonPositions.Count > 0)
 		{
@@ -370,39 +397,100 @@ public class HUB : MonoBehaviour {
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
 	//x and y are in grid space here
-	void findPlacesToSummon(ArrayList characterPos, float range, int x, int y)
+	void findPlacesToSummon(ArrayList summonPos, float range, int x, int y)
 	{
+		Vector2 pos = new Vector2(x, y);
 		//stop when you cant move
 		if (range < 0)
 			return;
 
 		//print("Can we put a tile down at: " + x + " , " + y + " ? With a range of: "+range);
-		//dont overlap positions and only add if the characterPossitino array doesnt have this position
-		if (!characterPos.Contains(new Vector2(x, y)) && !characterPositions.Contains(cursor.RoundPosition(new Vector2(x*spacer, y*spacer))))
-		//if(!characterPositions.Contains(cursor.RoundPosition(new Vector2(x * spacer, y * spacer))))
+		//dont overlap positions and only add if the characterPossitinon array doesnt have this position
+		if (!summonPos.Contains(pos) && !characterPositions.Contains(gridToWorld(pos)))
 		{
 			//if so, add this postion for spawning
-			characterPos.Add(new Vector2(x, y));
+			summonPos.Add(pos);
 		}
 
 
 		//move up,left,right,down
 		if (y + 1 <= realRound(cursor.maxY / cursor.spacer))
 		{
-			findPlacesToSummon(characterPos, range - 1, x, y + 1);
+			findPlacesToSummon(summonPos, range - 1, x, y + 1);
 		}
 		if (x - 1 >= 0)
 		{
-			findPlacesToSummon(characterPos, range - 1, x - 1, y);
+			findPlacesToSummon(summonPos, range - 1, x - 1, y);
 		}
 		if (x + 1 <= realRound(cursor.maxX / cursor.spacer))
 		{
-			findPlacesToSummon(characterPos, range - 1, x + 1, y);
+			findPlacesToSummon(summonPos, range - 1, x + 1, y);
 		}
 		if (y - 1 >= 0)
 		{
-			findPlacesToSummon(characterPos, range - 1, x, y - 1);
+			findPlacesToSummon(summonPos, range - 1, x, y - 1);
 		}
+	}
+
+	Vector2 gridToWorld(Vector2 gridCoord)
+	{
+		return roundPosition(new Vector2(gridCoord.x * spacer, gridCoord.y * spacer));
+	}
+	Vector2 worldToGrid(Vector2 worldCoord)
+	{
+		int x = realRound(worldCoord.x / spacer);
+		int y = realRound(worldCoord.y / spacer);
+		return new Vector2(x, y);
+	}
+
+	/*
+	 * When clicking to move, the position doesnt necessarily stay grid like
+	 * This function converts a clicked location into a grid location.
+	 * The function is currently being used to convert gridspace coordinates to world space.
+	 * "pos" here is in world space
+	 */
+	public Vector2 roundPosition(Vector2 pos)
+	{
+		float xPos = 0;
+		float yPos = 0;
+
+		//find the first position that is greater than the one clicked
+		while (xPos < Mathf.Abs(pos.x))
+		{
+			xPos += spacer;
+		}
+		while (yPos < Mathf.Abs(pos.y))
+		{
+			yPos += spacer;
+		}
+		//look at the last position for both
+		float lxPos = xPos - spacer;
+		float lyPos = yPos - spacer;
+
+		//set xPos to the closer position to wherever they clicked
+		if (Mathf.Abs(lxPos - Mathf.Abs(pos.x)) < Mathf.Abs(xPos - Mathf.Abs(pos.x)))
+		{
+			xPos = lxPos;
+		}
+		//same for y
+		if (Mathf.Abs(lyPos - Mathf.Abs(pos.y)) < Mathf.Abs(yPos - Mathf.Abs(pos.y)))
+		{
+			yPos = lyPos;
+		}
+
+		//the algorithm I used here only really works for finding the best positive numbers,
+		//so I just made everything positive, then multiply by -1 if it was negative (y)
+		if (pos.x < 0)
+		{
+			xPos *= -1;
+		}
+		if (pos.y < 0)
+		{
+			yPos *= -1;
+		}
+		Vector2 newPos = new Vector2(xPos, yPos);
+
+		return newPos;
 	}
 
 	int realRound(float f)

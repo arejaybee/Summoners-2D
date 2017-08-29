@@ -21,7 +21,7 @@ public class Turns : MonoBehaviour
 	void Update ()
 	{
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
-		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.select && !hub.cursor.summoning && !hub.cursor.attacking)
+		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)
 		{
 			hub.RemoveTiles("SummonTile");
 			hub.RemoveTiles("MoveTile");

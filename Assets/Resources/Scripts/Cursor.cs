@@ -9,7 +9,7 @@ public class Cursor : MonoBehaviour {
 	public float maxY;
 	public float spacer;
 	public bool cursorCanMove;
-	public bool select;//if this is true, we can pick up a unit
+	public bool canSelect;//if this is true, we can pick up a unit
 	public bool summoning;
 	public bool attacking;
 	public Character selectedCharacter;
@@ -28,7 +28,7 @@ public class Cursor : MonoBehaviour {
 		spacer = size / 1.5f;
 		//we do not start with a character started
 		selectedCharacter = null;
-		select = true;
+		canSelect = true;
 		cursorCanMove = true;
 		turn = FindObjectOfType<Turns>();
 		maxX = spacer * (hub.mapGenerator.boundsX - 1);
@@ -56,7 +56,7 @@ public class Cursor : MonoBehaviour {
 		//If we are summoning, there will also be no limit to where the cursor can move. This was done because
 		//there will be cases where some summon tiles are cut off from the rest, so moving to them will be harder with bounds.
 		//I am doing the same thing I did with summoning for attacking. It just makes things easier on my end for now
-		if (select || summoning || attacking)
+		if (canSelect || summoning || attacking)
 		{
 			LimitToBounds();
 		}
@@ -135,7 +135,7 @@ public class Cursor : MonoBehaviour {
 			hub.lastTimeZ = Time.time;
 
 			//if you have not selected a character, do so
-			if (select && !summoning && !attacking)
+			if (canSelect && !summoning && !attacking)
 			{
 				DetectSelect();
 			}
@@ -145,7 +145,7 @@ public class Cursor : MonoBehaviour {
 			{
 				if(isOnTile("SummonTile"))
 				{
-					select = true;
+					canSelect = true;
 					summoning = false;
 					hub.RemoveTiles("SummonTile");
 					selectedCharacter = null;
@@ -156,7 +156,7 @@ public class Cursor : MonoBehaviour {
 			{
 				if(isOnTile("EnemyTile"))
 				{
-					select = true;
+					canSelect = true;
 					attacking = false;
 					hub.RemoveTiles("EnemyTile");
 					//print(fightingCharacter.name);
@@ -175,7 +175,7 @@ public class Cursor : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.25f && !summoning)
 		{
 			hub.lastTimeX = Time.time;
-			if (!select)
+			if (!canSelect)
 			{
 				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
 			}
@@ -183,7 +183,7 @@ public class Cursor : MonoBehaviour {
 			{
 				selectedCharacter = null;
 			}
-			select = true;
+			canSelect = true;
 
 			//remove the extra tiles
 			hub.RemoveTiles("MoveTile");
@@ -268,7 +268,7 @@ public class Cursor : MonoBehaviour {
 			selectedCharacter = null;
 		}
 		hub.enemyPositions.Clear();
-		select = true;
+		canSelect = true;
 		cursorCanMove = true;
 		//remove the move tiles
 		hub.RemoveTiles("MoveTile");
@@ -280,8 +280,9 @@ public class Cursor : MonoBehaviour {
 	void DetectSelect()
 	{
 		Character c = hub.findCharacterAt(transform.position);
+
 		//if you hit a character, and you can select something
-		if (c != null && select)
+		if (c != null && canSelect)
 		{
 			//if its that characters turn
 			if (c.playerNumber == turn.playerTurn)
@@ -291,7 +292,7 @@ public class Cursor : MonoBehaviour {
 				{
 					//select them with the cursor
 					selectedCharacter = c;
-					select = false;
+					canSelect = false;
 					charOrgX = selectedCharacter.transform.position.x;
 					charOrgY = selectedCharacter.transform.position.y;
 				}
@@ -306,7 +307,7 @@ public class Cursor : MonoBehaviour {
 				}
 			}
 		}
-		if (!select) 
+		if (!canSelect) 
 		{
 			//if you select a character, put down move tiles
 			//put down the places this char can move
@@ -371,64 +372,13 @@ public class Cursor : MonoBehaviour {
 		return returnable;
 	}
 
-	/*
-	 * When clicking to move, the position doesnt necessarily stay grid like
-	 * This function converts a clicked location into a grid location.
-	 * The function is currently being used to convert gridspace coordinates to world space.
-	 * "pos" here is in world space
-	 */
-	public Vector3 RoundPosition(Vector3 pos)
-	{
-		float xPos = 0;
-		float yPos = 0;
-
-		//find the first position that is greater than the one clicked
-		while(xPos < Mathf.Abs(pos.x))
-		{
-			xPos += spacer;
-		}
-		while (yPos < Mathf.Abs(pos.y))
-		{
-			yPos += spacer;
-		}
-		//look at the last position for both
-		float lxPos = xPos - spacer;
-		float lyPos = yPos - spacer;
-
-		//set xPos to the closer position to wherever they clicked
-		if (Mathf.Abs(lxPos - Mathf.Abs(pos.x)) < Mathf.Abs(xPos - Mathf.Abs(pos.x)))
-		{
-			xPos = lxPos;
-		}
-		//same for y
-		if (Mathf.Abs(lyPos - Mathf.Abs(pos.y)) < Mathf.Abs(yPos - Mathf.Abs(pos.y)))
-		{
-			yPos = lyPos;
-		}
-
-		//the algorithm I used here only really works for finding the best positive numbers,
-		//so I just made everything positive, then multiply by -1 if it was negative (y)
-		if(pos.x < 0)
-		{
-			xPos *= -1;
-		}
-		if(pos.y < 0)
-		{
-			yPos *= -1;
-		}
-		Vector2 newPos = new Vector2(xPos, yPos);
-
-		return newPos;
-	}
+	
 
 	//"pos" here is in grid space. 
 	public void MoveTo(Vector2 pos)
 	{
 		transform.position = new Vector2(pos.x * spacer, pos.y * spacer);
 	}
-
-
-	
 
 	//Rounds each component of a vector2
 	Vector2 realRound(Vector2 f)
