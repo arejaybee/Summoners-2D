@@ -10,12 +10,12 @@ public class Character : MonoBehaviour
 {
     public float maxHp;
     public float hp;
-    public float attkRange;
-    public float attk;
-    public float defense;
+    public int attkRange;
+    public int attk;
+    public int defense;
     public int move;
 	public int zeal;
-	public float playerNumber;
+	public int playerNumber;
     public new string name;
     public string description;
 	public string topBarDescription;
@@ -72,6 +72,7 @@ public class Character : MonoBehaviour
 	{
 		Start();
 	}
+
 	public void CreateCharacter()
 	{
 		Start();
@@ -92,7 +93,11 @@ public class Character : MonoBehaviour
 		//if that character survives it hits back
 		if (char2.hp > 0)
 		{
-			battle(char2, this);
+			//if char2 has the range for it
+			if (char2.attkRange >= attkRange)
+			{
+				battle(char2, this);
+			}
 		}
 	}
 
@@ -132,6 +137,8 @@ public class Character : MonoBehaviour
 			}
 		}
 	}
+
+
 
 	public void speak(Character c2)
 	{
@@ -232,4 +239,6 @@ public class Character : MonoBehaviour
 		}
 		return this.name.CompareTo(b.name);
 	}
+
+
 }

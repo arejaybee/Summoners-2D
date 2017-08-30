@@ -56,19 +56,7 @@ public class Cursor : MonoBehaviour {
 		//If we are summoning, there will also be no limit to where the cursor can move. This was done because
 		//there will be cases where some summon tiles are cut off from the rest, so moving to them will be harder with bounds.
 		//I am doing the same thing I did with summoning for attacking. It just makes things easier on my end for now
-		if (canSelect || summoning || attacking)
-		{
-			LimitToBounds();
-		}
-		//if there is a character selected, find where it can move, and then limit the cursor to that
-		else
-		{
-			if(!LimitToMoveTiles())
-			{ 
-				//if there was no move tile, you cant move there
-				transform.position = new Vector3(orgX, orgY, 0);
-			}
-		}
+		LimitToBounds();
 
 
 		//when the cursor switches to attack mode, we need to know which 
@@ -165,7 +153,7 @@ public class Cursor : MonoBehaviour {
 				}
 			}
 			//if you have a character selected, give them options from this point
-			else
+			else if(isOnTile("MoveTile"))
 			{
 				GoToMoveMenu();
 			}
@@ -207,11 +195,14 @@ public class Cursor : MonoBehaviour {
 				}
 				break;
 			case ("MoveTile"):
+				if (hub.moveTilePositions.Contains(new Vector2(getIntX(), getIntY())))
+				{
+					ret = true;
+				}
 				break;
 			case ("EnemyTile"):
 				if(hub.enemyPositions.Contains(new Vector2(getIntX(), getIntY())))
 				{
-					print("The cursor knows it is on an enemy Tile");
 					ret = true;
 				}
 				break;
@@ -279,7 +270,7 @@ public class Cursor : MonoBehaviour {
 	 * */
 	void DetectSelect()
 	{
-		Character c = hub.findCharacterAt(transform.position);
+		Character c = hub.findCharacterAt((Vector2)transform.position);
 
 		//if you hit a character, and you can select something
 		if (c != null && canSelect)

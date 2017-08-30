@@ -141,6 +141,7 @@ public class MoveMenuHandler : MonoBehaviour
 		hub.cam.toggleChildren();
 		hub.cam.goToSummonMenu();
 	}
+
 	public void beginAttacking()
 	{
 		//create enemy tiles

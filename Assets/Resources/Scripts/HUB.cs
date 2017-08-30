@@ -22,6 +22,7 @@ public class HUB : MonoBehaviour {
 	public ArrayList enemyPositions;//grid space coordinates
 	public float spacer;
 	public ArrayList summonPositions;//gird space coordinates
+	public ArrayList moveTilePositions;//grid space coordinates
 	public ArrayList charsInRange;
 
 	//Time since the last time these keys were pressed
@@ -35,7 +36,7 @@ public class HUB : MonoBehaviour {
 
 	private ArrayList mapTiles;
 	private ArrayList mapTilePos;
-	private ArrayList moveTilePositions;//grid space coordinates
+
 
 	// Use this for initialization
 	void Start ()
@@ -121,16 +122,27 @@ public class HUB : MonoBehaviour {
 	//where pos is in world space
 	public Character findCharacterAt(Vector2 pos)
 	{
-		pos = roundPosition(pos);
-		print("My position is: " + pos);
-		print("The characters are at: ");
+		/*pos = roundPosition(pos);
+		print("Will find a character at: " + pos);
 		for(int i = 0; i < characterPositions.Count; i++)
 		{
-
+			print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
 		}
+
 		if(characterPositions.Contains(pos))
 		{
+			print("This was hit...");
 			return (Character)characters[characterPositions.IndexOf(pos)];
+		}
+		return null;*/
+		pos = roundPosition(pos);
+		for (int i = 0; i < characterPositions.Count; i++)
+		{
+			//print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
+			if((Vector2)characterPositions[i] == pos)
+			{
+				return ((Character)characters[i]);
+			}
 		}
 		return null;
 	}
@@ -284,7 +296,7 @@ public class HUB : MonoBehaviour {
 		Vector2 worldSpaceLoc = (gridToWorld(pos));
 	
 		//if there is a character on this square that is not your ally, you cannotmove there.
-		if (hasMoved && characterPositions.Contains(worldSpaceLoc) && findCharacterAt(worldSpaceLoc).isAllyTo(charToMove))
+		if (hasMoved && characterPositions.Contains(worldSpaceLoc) && !findCharacterAt(worldSpaceLoc).isAllyTo(charToMove))
 		{
 			return;
 		}
@@ -294,8 +306,11 @@ public class HUB : MonoBehaviour {
 		//dont overlap positions
 		if (!moveTilePositions.Contains(pos))
 		{
-			//add this postion for spawning
-			moveTilePositions.Add(pos);
+			if (!hasMoved || (hasMoved && !characterPositions.Contains(worldSpaceLoc)))
+			{
+				//add this postion for spawning
+				moveTilePositions.Add(pos);
+			}
 		}
 		
 		//move up,left,right,down
@@ -344,7 +359,7 @@ public class HUB : MonoBehaviour {
 					obj.transform.position = gridToWorld((Vector2)moveTilePositions[i]);
 					break;
 				case ("EnemyTile"):
-					obj.transform.position = gridToWorld((Vector2)enemyPositions[i]); 
+					obj.transform.position = gridToWorld((Vector2)enemyPositions[i]);
 					break;
 				case ("SummonTile"):
 					obj.transform.position = gridToWorld((Vector2)summonPositions[i]);
@@ -491,6 +506,21 @@ public class HUB : MonoBehaviour {
 		Vector2 newPos = new Vector2(xPos, yPos);
 
 		return newPos;
+	}
+
+	//for some reason the contains function does not work as it should, so I wrote my own
+	public bool listHasVector(ArrayList list, Vector2 pos)
+	{
+		pos = roundPosition(pos);
+		for (int i = 0; i < characterPositions.Count; i++)
+		{
+			//print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
+			if ((Vector2)characterPositions[i] == pos)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	int realRound(float f)

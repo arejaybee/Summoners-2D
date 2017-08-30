@@ -61,6 +61,7 @@ public class TopBar : MonoBehaviour
 		GameObject playerNum = topBar.transform.FindChild("PlayerNum").gameObject;
 		GameObject description = topBar.transform.FindChild("Description").gameObject;
 		GameObject icon = topBar.transform.FindChild("Icon").gameObject;
+
 		topBar.GetComponent<SpriteRenderer>().color = selectedChar.getPlayerColor();
 		//set HP
 		hp.GetComponent<TextMesh>().text = "HP: " + selectedChar.hp.ToString() + "/" + selectedChar.maxHp.ToString();
