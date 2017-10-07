@@ -29,7 +29,14 @@ public class Summoner : Character {
 		canUseZeal = true;
 		armySize = 10;
 		numUnits = 0;
-		mana = 5;
+		if (playerNumber == 1)
+		{
+			mana = 5;
+		}
+		else
+		{
+			mana = 0;
+		}
 		topBarDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
 	protected override void Update()

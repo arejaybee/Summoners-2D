@@ -5,6 +5,7 @@ using UnityEngine;
 public class Turns : MonoBehaviour
 {
 	public int numberOfPlayers = 1;
+	public bool firstTurn = true;
 	public int playerTurn;
 	public GameObject turnDisplay;
 	private HUB hub;
@@ -13,6 +14,7 @@ public class Turns : MonoBehaviour
 	void Start ()
 	{
 		playerTurn = 1;
+	
 		hub = GameObject.FindObjectOfType<HUB>();
 		turnDisplay = GameObject.Find("TurnDisplay");
 	}
@@ -23,6 +25,10 @@ public class Turns : MonoBehaviour
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
 		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)
 		{
+			if(firstTurn)
+			{
+				firstTurn = false;
+			}
 			hub.RemoveTiles("SummonTile");
 			hub.RemoveTiles("MoveTile");
 			hub.RemoveTiles("EnemyTile");
