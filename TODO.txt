@@ -1,0 +1,43 @@
+<MULTIPLAYER>
+	-Rewrite game to work with N players, rather than just 2
+	-Try to make more maps
+	-place characters onto maps dynamically based on number of players
+</MULTIPLAYER>
+
+<SINGLEPLAYER>
+	-Set up a story mode
+	-Set up a training mode
+</SINGLEPLAYER>
+
+<MENUS>
+	-Need to make a main menu
+	<MAIN MENU>
+		-Singleplayer option
+		-Multiplayer option
+		-Settings option
+		-Possibly credits in the future
+		-needs a graphic
+	</MAIN MENU>
+	-possibly go back and make the existing menus look better (set them up so Cheebychibs can add art assets later)
+	-set up controls to work on menus
+</MENUS>
+
+<SETTINGS>
+	-Adjust volume (when we get around to adding sound)
+	-Adjust brightness, contrast, basic color stuff
+	-Adjust screen size
+	-Adjust controller - for each player (each player should be able to select a keyboard or controller that is connected)
+</SETTINGS>
+
+<CAMERA>
+	-Allow camera to zoom in and out with a button press
+	-Add a second camera to work as a minimap (just an idea at this point)
+</CAMERA>
+
+<OTHER>
+	-Dynamicallly spawn maps based on a random (semirandom?) seed
+	-make a story lol
+	-balance? maybe later
+	-Look into Online capability (after multiplayer is working properly)
+	-get a better input method so we can distinguish controller from keyboard input
+</OTHER>
