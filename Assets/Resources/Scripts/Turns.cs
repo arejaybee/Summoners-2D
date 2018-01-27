@@ -3,27 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Turns : MonoBehaviour
-{
+{ 
 	public int numberOfPlayers = 1;
 	public bool firstTurn = true;
 	public int playerTurn;
 	public GameObject turnDisplay;
 	private HUB hub;
+	private Player player;
 
 	// Use this for initialization
 	void Start ()
 	{
 		playerTurn = 1;
-	
 		hub = GameObject.FindObjectOfType<HUB>();
 		turnDisplay = GameObject.Find("TurnDisplay");
+		player = hub.getPlayer(playerTurn);
+		
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+		//keep track of who's turn it is
+		player = hub.getPlayer(playerTurn);
+
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
-		if(Input.GetKeyDown(KeyCode.E) && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)
+		if(player.getGamepad().isPressed("end") && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)
 		{
 			if(firstTurn)
 			{
@@ -68,5 +73,10 @@ public class Turns : MonoBehaviour
 		}
 		//say whose turn it is
 		turnDisplay.GetComponent<SpriteRenderer>().sprite = Resources.Load("Prefab/Turns/P"+playerTurn+"Turn",typeof(Sprite)) as Sprite;
+	}
+
+	public Player getPlayer()
+	{
+		return player;
 	}
 }

@@ -12,6 +12,7 @@ using UnityEngine;
 public class HUB : MonoBehaviour {
 	public Cursor cursor;
 	public Turns turn;
+	public Player[] players;
 	public MoveMenuHandler moveMenuHandler;
 	public MapGenerator mapGenerator;
 	public CameraController cam;
@@ -39,7 +40,7 @@ public class HUB : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start ()
+	void Start()
 	{
 		cursor = GameObject.FindObjectOfType<Cursor>();
 		moveMenuHandler = GameObject.FindObjectOfType<MoveMenuHandler>();
@@ -58,6 +59,11 @@ public class HUB : MonoBehaviour {
 		enemyPositions = new ArrayList();
 		summonPositions = new ArrayList();
 		charsInRange = new ArrayList();
+		players = new Player[2];
+		for(int i = 0; i < players.Length; i++)
+		{
+			players[i] = new Player(i+1);
+		}
 
 		if(s[0].playerNumber == 1)
 		{
@@ -392,7 +398,10 @@ public class HUB : MonoBehaviour {
 				break;
 		}
 	}
-
+	public Player getPlayer(int num)
+	{
+		return players[num - 1];
+	}
 	public bool canSummon()
 	{
 		//must have the minimum mana to summon a unit

@@ -90,25 +90,25 @@ public class Cursor : MonoBehaviour {
 		//moving smoothley
 
 		//up
-		if (Input.GetKey(KeyCode.UpArrow) && Time.time - hub.lastTimeUp >= 0.1f)
+		if (turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
 		{
 			hub.lastTimeUp = Time.time;
 			mv = new Vector3(0, spacer, 0);
 		}
 		//down
-		if (Input.GetKey(KeyCode.DownArrow) && Time.time - hub.lastTimeDown >= 0.1f)
+		if (turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
 		{
 			hub.lastTimeDown = Time.time;
 			mv = new Vector3(0, -1*spacer, 0);
 		}
 		//right
-		if (Input.GetKey(KeyCode.RightArrow) && Time.time - hub.lastTimeRight >= 0.1f)
+		if (turn.getPlayer().getGamepad().isPressed("right") && Time.time - hub.lastTimeRight >= 0.1f)
 		{
 			hub.lastTimeRight = Time.time;
 			mv = new Vector3(spacer, 0, 0);
 		}
 		//left
-		if (Input.GetKey(KeyCode.LeftArrow) && Time.time - hub.lastTimeLeft >= 0.1f)
+		if (turn.getPlayer().getGamepad().isPressed("left") && Time.time - hub.lastTimeLeft >= 0.1f)
 		{
 			hub.lastTimeLeft = Time.time;
 			mv = new Vector3(-1*spacer, 0, 0);
@@ -118,7 +118,7 @@ public class Cursor : MonoBehaviour {
 		//from canceling and confirming between menus. Sometimes this can be noticable, but hardly..
 
 		//on confirm
-		if(Input.GetKeyDown(KeyCode.Z) && Time.time - hub.lastTimeZ >= 0.25f)
+		if(turn.getPlayer().getGamepad().isPressed("confirm") && Time.time - hub.lastTimeZ >= 0.25f)
 		{
 			hub.lastTimeZ = Time.time;
 
@@ -160,7 +160,7 @@ public class Cursor : MonoBehaviour {
 		}
 
 		//on cancel
-		if(Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.25f && !summoning)
+		if(turn.getPlayer().getGamepad().isPressed("cancel") && Time.time - hub.lastTimeX >= 0.25f && !summoning)
 		{
 			hub.lastTimeX = Time.time;
 			if (!canSelect)

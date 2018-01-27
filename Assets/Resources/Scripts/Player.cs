@@ -7,6 +7,10 @@ public class Player
 	private int m_playerNum;
 	private bool m_turn;
 	private Gamepad m_gamepad;
+	public Player()
+	{
+
+	}
 	public Player(int num)
 	{
 		m_playerNum = num;
@@ -22,9 +26,18 @@ public class Player
 	{
 		return m_playerNum;
 	}
+	public Gamepad getGamepad()
+	{
+		return m_gamepad;
+	}
+
 	//setters
 	public void setTurn(bool turn)
 	{
 		m_turn = turn;
+	}
+	public void setGamePad(Gamepad g)
+	{
+		m_gamepad = g;
 	}
 }
