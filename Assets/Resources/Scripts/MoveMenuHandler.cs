@@ -53,7 +53,7 @@ public class MoveMenuHandler : MonoBehaviour
 			else if (Input.GetKeyDown(KeyCode.Z))
 			{
 				hub.lastTimeZ = Time.time;
-				passOption(((GameObject)menuItems[selectedItem]).transform.FindChild("Text").GetComponent<TextMesh>().text.ToString());
+				passOption(((GameObject)menuItems[selectedItem]).transform.Find("Text").GetComponent<TextMesh>().text.ToString());
 
 			}
 
@@ -109,7 +109,7 @@ public class MoveMenuHandler : MonoBehaviour
 		for(int i = 0; i < options.Count; i++)
 		{
 			GameObject mItem = (GameObject)Instantiate(Resources.Load("Prefab/Tiles/MenuItem"));
-			mItem.transform.FindChild("Text").GetComponent<TextMesh>().text = options[i].ToString();
+			mItem.transform.Find("Text").GetComponent<TextMesh>().text = options[i].ToString();
 			mItem.transform.position = new Vector3(position.x, position.y - (i * 2.5f), position.z);
 			menuItems.Add(mItem);
 			selectedItem = i;

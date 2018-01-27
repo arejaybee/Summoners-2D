@@ -54,13 +54,13 @@ public class TopBar : MonoBehaviour
 	//display information about the character that the cursor is on.
 	void FillTopInfo()
 	{
-		GameObject hp = topBar.transform.FindChild("HP").gameObject;
-		GameObject hPBar = topBar.transform.FindChild("HPBar").gameObject;
-		GameObject name = topBar.transform.FindChild("Name").gameObject;
-		GameObject stats = topBar.transform.FindChild("Stats").gameObject;
-		GameObject playerNum = topBar.transform.FindChild("PlayerNum").gameObject;
-		GameObject description = topBar.transform.FindChild("Description").gameObject;
-		GameObject icon = topBar.transform.FindChild("Icon").gameObject;
+		GameObject hp = topBar.transform.Find("HP").gameObject;
+		GameObject hPBar = topBar.transform.Find("HPBar").gameObject;
+		GameObject name = topBar.transform.Find("Name").gameObject;
+		GameObject stats = topBar.transform.Find("Stats").gameObject;
+		GameObject playerNum = topBar.transform.Find("PlayerNum").gameObject;
+		GameObject description = topBar.transform.Find("Description").gameObject;
+		GameObject icon = topBar.transform.Find("Icon").gameObject;
 
 		topBar.GetComponent<SpriteRenderer>().color = selectedChar.getPlayerColor();
 		//set HP

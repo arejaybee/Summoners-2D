@@ -27,6 +27,6 @@ public class ManaCounters : MonoBehaviour
 			manaVal = 0;
 		}
 		mana = "Mana\n\n" + manaVal.ToString("D4");//D4 means the number will have 4 digits eg: 2 -> 0002
-		transform.FindChild("Mana").GetComponent<TextMesh>().text = mana;
+		transform.Find("Mana").GetComponent<TextMesh>().text = mana;
 	}
 }

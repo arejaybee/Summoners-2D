@@ -11,7 +11,7 @@ public class SummonOption : MonoBehaviour
 	{
 		if (c != null)
 		{
-			transform.FindChild("Text").GetComponent<TextMesh>().text = c.name;
+			transform.Find("Text").GetComponent<TextMesh>().text = c.name;
 		}
 	}
 	
