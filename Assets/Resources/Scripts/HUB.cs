@@ -18,8 +18,6 @@ public class HUB : MonoBehaviour {
 	public CameraController cam;
 	public ArrayList characters; //an arraylist of all of the characters
 	public ArrayList characterPositions;//world space coordinates
-	public Summoner summoner1;
-	public Summoner summoner2;
 	public ArrayList enemyPositions;//grid space coordinates
 	public float spacer;
 	public ArrayList summonPositions;//gird space coordinates
@@ -37,10 +35,11 @@ public class HUB : MonoBehaviour {
 
 	private ArrayList mapTiles;
 	private ArrayList mapTilePos;
+	private bool gameOver;
 
 
-	// Use this for initialization
-	void Start()
+	// This is called once the user hits play. Before the first frame
+	void Awake()
 	{
 		cursor = GameObject.FindObjectOfType<Cursor>();
 		moveMenuHandler = GameObject.FindObjectOfType<MoveMenuHandler>();
@@ -55,27 +54,24 @@ public class HUB : MonoBehaviour {
 		characters = new ArrayList();
 		characterPositions = new ArrayList();
 		turn = FindObjectOfType<Turns>();
-		Summoner[] s = FindObjectsOfType<Summoner>();
 		enemyPositions = new ArrayList();
 		summonPositions = new ArrayList();
 		charsInRange = new ArrayList();
 		players = new Player[2];
-		for(int i = 0; i < players.Length; i++)
+		gameOver = false;
+	}
+
+	//called once the game is loaded, on the first frame
+	void Start()
+	{
+		//give each player one of the summoners from this map
+		for (int i = 0; i < players.Length; i++)
 		{
-			players[i] = new Player(i+1);
+			players[i] = new Player(i + 1);
+			players[i].setSummoner(FindObjectsOfType<Summoner>()[i]);
 		}
 
-		if(s[0].playerNumber == 1)
-		{
-			summoner1 = s[0];
-			summoner2 = s[1];
-		}
-		else
-		{
-			summoner1 = s[1];
-			summoner2 = s[0];
-		}
-
+		//get an understanding of the map
 		spacer = cursor.size / 1.5f;
 		mapTiles = new ArrayList();
 		mapTilePos = new ArrayList();
@@ -87,7 +83,6 @@ public class HUB : MonoBehaviour {
 			mapTiles.Add(mt[i]);
 			mapTilePos.Add(new Vector2(realRound(mt[i].transform.position.x / spacer), realRound(mt[i].transform.position.y / spacer)));
 		}
-	
 	}
 	
 	// Update is called once per frame
@@ -96,51 +91,34 @@ public class HUB : MonoBehaviour {
 		characterPositions.Clear();
 		characters.Clear();
 		Character[] chars = GameObject.FindObjectsOfType<Character>();
-		for(int i = 0; i < chars.Length; i++)
+		for (int i = 0; i < chars.Length; i++)
 		{
 			characters.Add((Character)chars[i]);
 			characterPositions.Add(roundPosition(chars[i].transform.position));
-			//get context of the summoners (if they werent found yet)
-			if(chars[i].name == "Summoner" && chars[i].playerNumber == 1)
-				{
-					summoner1 = (Summoner)chars[i];
-				}
-			if (chars[i].name == "Summoner" && chars[i].playerNumber == 2)
-				{
-					summoner2 = (Summoner)chars[i];
-				}
-			}
+		}
 	}
 
 	public Summoner getCurrentSummoner()
 	{
+		return turn.getPlayer().getSummoner();
+	}
 
-		Summoner[] sm = GameObject.FindObjectsOfType<Summoner>();
-		if (sm[0].playerNumber == turn.playerTurn)
+	//checks if all but 1 player has lost
+	public bool GameOver()
+	{
+		int count = 0;
+		foreach(Player p in players)
 		{
-			return sm[0];
+			if (p.hasLost())
+				count++;
 		}
-		else
-			return sm[1];
+		return (count == players.Length - 1);
 	}
 
 	//given a position, find a character that is at the position
 	//where pos is in world space
 	public Character findCharacterAt(Vector2 pos)
 	{
-		/*pos = roundPosition(pos);
-		print("Will find a character at: " + pos);
-		for(int i = 0; i < characterPositions.Count; i++)
-		{
-			print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
-		}
-
-		if(characterPositions.Contains(pos))
-		{
-			print("This was hit...");
-			return (Character)characters[characterPositions.IndexOf(pos)];
-		}
-		return null;*/
 		pos = roundPosition(pos);
 		for (int i = 0; i < characterPositions.Count; i++)
 		{

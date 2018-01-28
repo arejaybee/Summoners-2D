@@ -26,6 +26,11 @@ public class Turns : MonoBehaviour
 	{
 		//keep track of who's turn it is
 		player = hub.getPlayer(playerTurn);
+		while(player.hasLost())
+		{
+			playerTurn++;
+			player = hub.getPlayer(playerTurn);
+		}
 
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
 		if(player.getGamepad().isPressed("end") && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)

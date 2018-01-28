@@ -25,13 +25,6 @@ public class Fairy : Character {
     //Fairies add 3 to the player's mana pool each turn
     public override void EndTurn()
     {
-		if(playerNumber == 1)
-		{
-			hub.summoner1.mana += 3;
-		}
-		else
-		{
-			hub.summoner2.mana += 3;
-		}
+		hub.getPlayer(playerNumber).getSummoner().mana += 3;
     }
 }

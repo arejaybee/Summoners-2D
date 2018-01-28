@@ -121,18 +121,13 @@ public class Character : MonoBehaviour
 			//players get some mana back if their unit dies
 			if (char2.hp <= 0)
 			{
-				switch ((int)char2.playerNumber)
+				if (char2.name == "Summoner")
 				{
-					case (1):
-						hub.summoner1.mana += char2.cost / 2;
-						break;
-					case (2):
-						hub.summoner2.mana += char2.cost / 2;
-						break;
-					default:
-						print("This should not be hit!");
-						break;
-
+					hub.getPlayer(char2.playerNumber).setLost(true);
+				}
+				else
+				{
+					hub.getPlayer(char2.playerNumber).getSummoner().mana += char2.cost / 2;
 				}
 			}
 		}
