@@ -17,7 +17,7 @@ public class Player
 	public Player(int num)
 	{
 		m_playerNum = num;
-		m_gamepad = new Gamepad();
+		m_gamepad = new Gamepad("keyboard");
 		m_characters = new ArrayList();
 		m_lost = false;
 	}
@@ -68,6 +68,6 @@ public class Player
 	}
 	public void setLost(bool flag)
 	{
-		m_won = flag;
+		m_lost = flag;
 	}
 }
