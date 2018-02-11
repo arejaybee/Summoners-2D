@@ -68,7 +68,13 @@ public class HUB : MonoBehaviour {
 		for (int i = 0; i < players.Length; i++)
 		{
 			players[i] = new Player(i + 1);
-			players[i].setSummoner(FindObjectsOfType<Summoner>()[i]);
+			foreach(Summoner s in FindObjectsOfType<Summoner>())
+			{
+				if(s.playerNumber == players[i].GetPlayerNum())
+				{
+					players[i].setSummoner(s);
+				}
+			}
 		}
 
 		//get an understanding of the map
@@ -382,6 +388,7 @@ public class HUB : MonoBehaviour {
 	}
 	public bool canSummon()
 	{
+		print(getCurrentSummoner().name);
 		//must have the minimum mana to summon a unit
 		if(getCurrentSummoner().mana < 2)
 		{
