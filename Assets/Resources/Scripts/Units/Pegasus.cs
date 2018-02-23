@@ -7,6 +7,7 @@ public class Pegasus : Character
 	protected override void Start()
 	{
 		name = "Pegasus";
+		faction = (int)FACTIONS.LIGHT;
 		base.Start();
 		maxHp = 10;
 		hp = 10;
@@ -17,7 +18,7 @@ public class Pegasus : Character
 		cost = 15;
 		zeal = 20;
 		canMove = true;
-		description = "Mobile units with\nno movement costs";
+		description = "Fast mobile units";
 		topBarDescription = "Winged horses that are able to move incredible distances.\n move over water and mountains for free";//(need to implement different costs for tile movements)
 		
 

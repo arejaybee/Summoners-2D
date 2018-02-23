@@ -8,7 +8,9 @@ using UnityEngine;
  */ 
 public class Character : MonoBehaviour
 {
-    public float maxHp;
+	public enum FACTIONS { LIGHT=0, DARK=1, EARTH=2, WEATHER=3};
+
+	public float maxHp;
     public float hp;
     public int attkRange;
     public int attk;
@@ -26,6 +28,8 @@ public class Character : MonoBehaviour
     public int cost;
 	protected bool piercing;
 	public string iconPath;
+	public int faction;
+
 	//literally just to size/space based on cursor size
 	public HUB hub;
 	private float spacer;
