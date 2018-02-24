@@ -16,8 +16,8 @@ public class MapGenerator : MonoBehaviour
 	void Start ()
 	{
 		hub = GameObject.FindObjectOfType<HUB>();
-		sum1 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner1")));
-		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner2")));
+		sum1 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
+		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
 
 		spacer = hub.cursor.size / 1.5f;
 		//Eventually, I want to be able to pass in a string and have that string be built. So that I can have several pre-built maps that are set to this variable.
