@@ -59,26 +59,20 @@ public class HUB : MonoBehaviour {
 		charsInRange = new ArrayList();
 		players = new Player[2];
 		gameOver = false;
+		//get an understanding of the map
+		spacer = cursor.transform.localScale.x / 1.5f;
+		for (int i = 0; i < players.Length; i++)
+		{
+			players[i] = new Player(i+1);
+			GameObject summoner = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
+			summoner.GetComponent<Summoner>().setPlayerNum(i + 1);
+			players[i].setSummoner(summoner.GetComponent<Summoner>());
+		}
 	}
 
 	//called once the game is loaded, on the first frame
 	void Start()
 	{
-		//give each player one of the summoners from this map
-		for (int i = 0; i < players.Length; i++)
-		{
-			players[i] = new Player(i + 1);
-			foreach(Summoner s in FindObjectsOfType<Summoner>())
-			{
-				if(s.playerNumber == players[i].GetPlayerNum())
-				{
-					players[i].setSummoner(s);
-				}
-			}
-		}
-
-		//get an understanding of the map
-		spacer = cursor.size / 1.5f;
 		mapTiles = new ArrayList();
 		mapTilePos = new ArrayList();
 
@@ -388,7 +382,6 @@ public class HUB : MonoBehaviour {
 	}
 	public bool canSummon()
 	{
-		print(getCurrentSummoner().name);
 		//must have the minimum mana to summon a unit
 		if(getCurrentSummoner().mana < 2)
 		{

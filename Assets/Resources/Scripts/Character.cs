@@ -46,7 +46,7 @@ public class Character : MonoBehaviour
         hp = maxHp;
 		canMove = true;
 		hub = FindObjectOfType<HUB>();
-		spacer = hub.cursor.spacer;
+		spacer = hub.spacer;
 		iconPath = "Icons/" + name + "Icon";
 	}
 

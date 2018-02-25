@@ -71,7 +71,6 @@ public class Turns : MonoBehaviour
 					{
 						((Summoner)chars[i]).mana += 5;//you get 5 mana every turn! (subject to change)
 						hub.cursor.transform.position = chars[i].transform.position;//put the cursor over the in-turn summoner
-						i = chars.Length + 1;
 					}
 				}
 			}

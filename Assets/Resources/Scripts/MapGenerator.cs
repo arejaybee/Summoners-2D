@@ -10,14 +10,15 @@ public class MapGenerator : MonoBehaviour
 	public int boundsY;
 	private float spacer;
 	private HUB hub;
+	private ArrayList summoners;
 	private GameObject sum1;
 	private GameObject sum2;
 	// Use this for initialization
 	void Start ()
 	{
 		hub = GameObject.FindObjectOfType<HUB>();
-		sum1 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
-		sum2 = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
+		sum1 = hub.players[0].getSummoner().gameObject;
+		sum2 = hub.players[1].getSummoner().gameObject;
 
 		spacer = hub.cursor.size / 1.5f;
 		//Eventually, I want to be able to pass in a string and have that string be built. So that I can have several pre-built maps that are set to this variable.
