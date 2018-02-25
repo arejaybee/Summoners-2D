@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HUB : MonoBehaviour {
+	public const int MAX_NUM_PLAYERS = 4;
 	public Cursor cursor;
 	public Turns turn;
 	public Player[] players;
@@ -68,6 +69,27 @@ public class HUB : MonoBehaviour {
 			summoner.GetComponent<Summoner>().setPlayerNum(i + 1);
 			players[i].setSummoner(summoner.GetComponent<Summoner>());
 		}
+		for(int i = players.Length; i < MAX_NUM_PLAYERS; i++)
+		{
+			GameObject.Destroy(GameObject.Find("PlayerDisplay" + (i+1)));
+		}
+		switch(players.Length){
+			case 3:
+				GameObject bar3 = GameObject.Find("PlayerDisplay1");
+				bar3 = bar3.transform.Find("P1Bar").gameObject;
+				bar3.transform.localScale = new Vector2(bar3.transform.localScale.x, 100);
+				break;
+			case 2:
+				for(int i = 0; i < players.Length; i++)
+				{
+					GameObject bar2 = GameObject.Find("PlayerDisplay" + (i + 1));
+					bar2 = bar2.transform.Find("P" + (i + 1) + "Bar").gameObject;
+					bar2.transform.localScale = new Vector2(bar2.transform.localScale.x, 100);
+				}
+				break;
+			default:
+				break;
+		} 
 	}
 
 	//called once the game is loaded, on the first frame
