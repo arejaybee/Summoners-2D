@@ -141,8 +141,9 @@ public class SummonMenu : MonoBehaviour
 	{
 		summonOptions[index].GetComponent<SpriteRenderer>().color = Color.green;
 		//move down the list
-		if(Input.GetKeyDown(KeyCode.DownArrow))
+		if(hub.turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
 		{
+			hub.lastTimeDown = Time.time;
 			if(index+1 < summonOptions.Count)
 			{
 				summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
@@ -151,8 +152,9 @@ public class SummonMenu : MonoBehaviour
 			}
 		}
 		//move up the list
-		else if(Input.GetKeyDown(KeyCode.UpArrow))
+		else if(hub.turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
 		{
+			hub.lastTimeUp = Time.time;
 			if(index-1 > -1)
 			{
 				summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
@@ -161,7 +163,7 @@ public class SummonMenu : MonoBehaviour
 			}
 		}
 		//select a character
-		else if(Input.GetKeyDown(KeyCode.Z))
+		else if(hub.turn.getPlayer().getGamepad().isPressed("confirm"))
 		{
 			hub.lastTimeZ = Time.time;
 			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
@@ -171,7 +173,7 @@ public class SummonMenu : MonoBehaviour
 			}
 		}
 		//go back to the map
-		else if(Input.GetKeyDown(KeyCode.X))
+		else if(hub.turn.getPlayer().getGamepad().isPressed("cancel"))
 		{
 			hub.lastTimeX = Time.time;
 			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;

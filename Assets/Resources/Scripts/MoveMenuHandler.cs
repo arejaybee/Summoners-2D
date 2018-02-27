@@ -26,7 +26,7 @@ public class MoveMenuHandler : MonoBehaviour
 			((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.green;
 
 			//go down
-			if (Input.GetKey(KeyCode.DownArrow) && Time.time - hub.lastTimeDown >= 0.1f)
+			if (hub.turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
 			{
 				hub.lastTimeDown = Time.time;
 				if (selectedItem < menuItems.Count-1 && menuItems.Count > 1)
@@ -39,8 +39,9 @@ public class MoveMenuHandler : MonoBehaviour
 			}
 
 			//go up
-			else if (Input.GetKeyDown(KeyCode.UpArrow))
+			else if (hub.turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
 			{
+				hub.lastTimeUp = Time.time;
 				if (selectedItem > 0)
 				{
 					((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.white;
@@ -50,7 +51,7 @@ public class MoveMenuHandler : MonoBehaviour
 			}
 
 			//pick the green item
-			else if (Input.GetKeyDown(KeyCode.Z))
+			else if (hub.turn.getPlayer().getGamepad().isPressed("confirm"))
 			{
 				hub.lastTimeZ = Time.time;
 				passOption(((GameObject)menuItems[selectedItem]).transform.Find("Text").GetComponent<TextMesh>().text.ToString());
@@ -58,7 +59,7 @@ public class MoveMenuHandler : MonoBehaviour
 			}
 
 			//cancel (return to moving the character)
-			else if (Input.GetKeyDown(KeyCode.X) && Time.time - hub.lastTimeX >= 0.5f)
+			else if (hub.turn.getPlayer().getGamepad().isPressed("cancel") && Time.time - hub.lastTimeX >= 0.5f)
 			{
 				hub.lastTimeX = Time.time;
 

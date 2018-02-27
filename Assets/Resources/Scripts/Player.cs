@@ -21,6 +21,13 @@ public class Player
 		m_characters = new ArrayList();
 		m_lost = false;
 	}
+	public Player(int num, string controller)
+	{
+		m_playerNum = num;
+		m_gamepad = new Gamepad("controller",num);
+		m_characters = new ArrayList();
+		m_lost = false;
+	}
 
 	public void addCharacter(Character c)
 	{

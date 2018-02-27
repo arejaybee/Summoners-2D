@@ -69,7 +69,10 @@ public class HUB : MonoBehaviour {
 			summoner.GetComponent<Summoner>().setPlayerNum(i + 1);
 			players[i].setSummoner(summoner.GetComponent<Summoner>());
 		}
-		for(int i = players.Length; i < MAX_NUM_PLAYERS; i++)
+		players[0].setGamePad(new Gamepad(Input.GetJoystickNames()[0], 1));
+		players[1].setGamePad(new Gamepad(Input.GetJoystickNames()[1], 2));
+
+		for (int i = players.Length; i < MAX_NUM_PLAYERS; i++)
 		{
 			GameObject.Destroy(GameObject.Find("PlayerDisplay" + (i+1)));
 		}
@@ -110,6 +113,8 @@ public class HUB : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+
+		print(players[0].getGamepad().m_yAxis);
 		characterPositions.Clear();
 		characters.Clear();
 		Character[] chars = GameObject.FindObjectsOfType<Character>();
