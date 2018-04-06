@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveTile : MonoBehaviour
+public class MoveTile : AbstractScript
 {
-	HUB hub;
 	// Use this for initialization
 	void Start ()
 	{
-		hub = FindObjectOfType<HUB>();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		if(hub.findCharacterAt(transform.position) == hub.cursor.selectedCharacter)
+		if(hub.findCharacterAt(transform.position) == hub.CURSOR.selectedCharacter)
 		{
 			GameObject.DestroyObject(this);
 		}

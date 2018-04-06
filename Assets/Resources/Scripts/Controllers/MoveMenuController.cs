@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveMenuHandler : MonoBehaviour
+public class MoveMenuController : AbstractScript
 {
 	ArrayList menuItems;//all of the menu items
 	private int selectedItem;//the current menu item that is highlighted
-	HUB hub;
 	public bool canMove;
 
 
 	// Use this for initialization
 	void Start ()
 	{
-		hub = GameObject.FindObjectOfType<HUB>();
 		menuItems = new ArrayList();
 		selectedItem = 0;
 		canMove = false;
@@ -26,9 +24,9 @@ public class MoveMenuHandler : MonoBehaviour
 			((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.green;
 
 			//go down
-			if (hub.turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
+			if (Turns.getCurrentPlayer().getGamepad().isPressed("down") && Time.time - hub.LAST_TIME_DOWN >= 0.1f)
 			{
-				hub.lastTimeDown = Time.time;
+				hub.LAST_TIME_DOWN = Time.time;
 				if (selectedItem < menuItems.Count-1 && menuItems.Count > 1)
 				{
 					((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.white;
@@ -39,9 +37,9 @@ public class MoveMenuHandler : MonoBehaviour
 			}
 
 			//go up
-			else if (hub.turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
+			else if (Turns.getCurrentPlayer().getGamepad().isPressed("up") && Time.time - hub.LAST_TIME_UP >= 0.1f)
 			{
-				hub.lastTimeUp = Time.time;
+				hub.LAST_TIME_UP = Time.time;
 				if (selectedItem > 0)
 				{
 					((GameObject)menuItems[selectedItem]).GetComponent<SpriteRenderer>().color = Color.white;
@@ -51,21 +49,21 @@ public class MoveMenuHandler : MonoBehaviour
 			}
 
 			//pick the green item
-			else if (hub.turn.getPlayer().getGamepad().isPressed("confirm"))
+			else if (Turns.getCurrentPlayer().getGamepad().isPressed("confirm"))
 			{
-				hub.lastTimeZ = Time.time;
+				hub.LAST_TIME_CONFIRM = Time.time;
 				passOption(((GameObject)menuItems[selectedItem]).transform.Find("Text").GetComponent<TextMesh>().text.ToString());
 
 			}
 
 			//cancel (return to moving the character)
-			else if (hub.turn.getPlayer().getGamepad().isPressed("cancel") && Time.time - hub.lastTimeX >= 0.5f)
+			else if (Turns.getCurrentPlayer().getGamepad().isPressed("cancel") && Time.time - hub.LAST_TIME_CANCEL >= 0.5f)
 			{
-				hub.lastTimeX = Time.time;
+				hub.LAST_TIME_CANCEL = Time.time;
 
 				//find a way to cancel and go back
 				removeMenu();
-				hub.cursor.cursorCanMove = true;
+				hub.CURSOR.cursorCanMove = true;
 			}
 		}
 	}
@@ -92,7 +90,7 @@ public class MoveMenuHandler : MonoBehaviour
 				break;
 			case ("Stop"):
 				removeMenu();
-				hub.cursor.confirmFromMoveMenu();
+				hub.CURSOR.confirmFromMoveMenu();
 				break;
 			default:
 				print("This should not happpen. We got the option: " + option);
@@ -139,8 +137,8 @@ public class MoveMenuHandler : MonoBehaviour
 	{
 		canMove = false;
 		GameObject.FindObjectOfType<SummonMenu>().canMove = true;
-		hub.cam.toggleChildren();
-		hub.cam.goToSummonMenu();
+		hub.CAMERA_CONTROLLER.toggleChildren();
+		hub.CAMERA_CONTROLLER.goToSummonMenu();
 	}
 
 	public void beginAttacking()
@@ -148,8 +146,8 @@ public class MoveMenuHandler : MonoBehaviour
 		//create enemy tiles
 		hub.MakeTiles("EnemyTile");
 		//set cursor flag to know it needs to attack
-		hub.cursor.attacking = true;
-		hub.cursor.cursorCanMove = true;
+		hub.CURSOR.attacking = true;
+	    hub.CURSOR.cursorCanMove = true;
 		removeMenu();
 	}
 	public void beginSpeaking()
@@ -158,11 +156,11 @@ public class MoveMenuHandler : MonoBehaviour
 		{
 			if(((Character)hub.charsInRange[i]).name != "Summoner")
 			{
-				hub.cursor.selectedCharacter.speak((Character)hub.charsInRange[i]);
+				hub.CURSOR.selectedCharacter.speak((Character)hub.charsInRange[i]);
 			}
 		}
-		hub.cursor.cursorCanMove = true;
-		hub.cursor.confirmFromMoveMenu();
+		hub.CURSOR.cursorCanMove = true;
+		hub.CURSOR.confirmFromMoveMenu();
 		removeMenu();
 	}
 }

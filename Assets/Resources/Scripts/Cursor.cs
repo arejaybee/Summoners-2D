@@ -3,11 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cursor : MonoBehaviour {
-	public float size;
-	public float maxX;
-	public float maxY;
-	public float spacer;
+public class Cursor : AbstractScript {
 	public bool cursorCanMove;
 	public bool canSelect;//if this is true, we can pick up a unit
 	public bool summoning;
@@ -17,24 +13,18 @@ public class Cursor : MonoBehaviour {
 	private float charOrgX, charOrgY;
 	private Character unselectableSummoner;
 	private Character fightingCharacter;
-	HUB hub;
-	Turns turn;
 
 	// Use this for initialization
 	void Start()
 	{
-		hub = GameObject.FindObjectOfType<HUB>();
-		size = transform.localScale.x;
-		spacer = size / 1.5f;
+		transform.localScale.Set(HUB.SIZE, HUB.SIZE, 1);
 		//we do not start with a character started
 		selectedCharacter = null;
 		canSelect = true;
 		cursorCanMove = true;
-		turn = FindObjectOfType<Turns>();
-		maxX = spacer * (hub.mapGenerator.boundsX - 1);
-		maxY = spacer * (hub.mapGenerator.boundsY - 1);
 		summoning = false;
 		attacking = false;
+		MoveTo(worldToGrid(Turns.getCurrentSummoner().transform.position));
 	}
 	// Update is called once per frame
 	void Update ()
@@ -90,37 +80,37 @@ public class Cursor : MonoBehaviour {
 		//moving smoothley
 
 		//up
-		if (turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("up") && Time.time - hub.LAST_TIME_UP >= 0.1f)
 		{
-			hub.lastTimeUp = Time.time;
-			mv = new Vector3(0, spacer, 0);
+			hub.LAST_TIME_UP = Time.time;
+			mv = new Vector3(0, HUB.SPACER, 0);
 		}
 		//down
-		if (turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("down") && Time.time - hub.LAST_TIME_DOWN >= 0.1f)
 		{
-			hub.lastTimeDown = Time.time;
-			mv = new Vector3(0, -1*spacer, 0);
+			hub.LAST_TIME_DOWN = Time.time;
+			mv = new Vector3(0, -1*HUB.SPACER, 0);
 		}
 		//right
-		if (turn.getPlayer().getGamepad().isPressed("right") && Time.time - hub.lastTimeRight >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("right") && Time.time - hub.LAST_TIME_RIGHT >= 0.1f)
 		{
-			hub.lastTimeRight = Time.time;
-			mv = new Vector3(spacer, 0, 0);
+			hub.LAST_TIME_RIGHT = Time.time;
+			mv = new Vector3(HUB.SPACER, 0, 0);
 		}
 		//left
-		if (turn.getPlayer().getGamepad().isPressed("left") && Time.time - hub.lastTimeLeft >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("left") && Time.time - hub.LAST_TIME_LEFT >= 0.1f)
 		{
-			hub.lastTimeLeft = Time.time;
-			mv = new Vector3(-1*spacer, 0, 0);
+			hub.LAST_TIME_LEFT = Time.time;
+			mv = new Vector3(-1*HUB.SPACER, 0, 0);
 		}
 		
 		//for confirm and cancel, I wait a bit longer between inputs to help stop the game
 		//from canceling and confirming between menus. Sometimes this can be noticable, but hardly..
 
 		//on confirm
-		if(turn.getPlayer().getGamepad().isPressed("confirm") && Time.time - hub.lastTimeZ >= 0.25f)
+		if(Turns.getCurrentPlayer().getGamepad().isPressed("confirm") && Time.time - hub.LAST_TIME_CONFIRM >= 0.25f)
 		{
-			hub.lastTimeZ = Time.time;
+			hub.LAST_TIME_CONFIRM = Time.time;
 
 			//if you have not selected a character, do so
 			if (canSelect && !summoning && !attacking)
@@ -160,9 +150,9 @@ public class Cursor : MonoBehaviour {
 		}
 
 		//on cancel
-		if(turn.getPlayer().getGamepad().isPressed("cancel") && Time.time - hub.lastTimeX >= 0.25f && !summoning)
+		if(Turns.getCurrentPlayer().getGamepad().isPressed("cancel") && Time.time - hub.LAST_TIME_CANCEL >= 0.25f && !summoning)
 		{
-			hub.lastTimeX = Time.time;
+			hub.LAST_TIME_CANCEL = Time.time;
 			if (!canSelect)
 			{
 				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
@@ -173,13 +163,13 @@ public class Cursor : MonoBehaviour {
 			}
 			canSelect = true;
 
-			//remove the extra tiles
+			//hub.Remove the extra tiles
 			hub.RemoveTiles("MoveTile");
 			hub.RemoveTiles("EnemyTile");
 			hub.RemoveTiles("SummonTile");
 		}
 
-		hub.cam.moveCamera(transform.position+mv);
+		hub.CAMERA_CONTROLLER.moveCamera(transform.position+mv);
 		transform.position += mv;
 	}
 
@@ -218,7 +208,7 @@ public class Cursor : MonoBehaviour {
 	{
 		ArrayList list = new ArrayList();
 		//if you are a summoner and can summon, you get the summon option
-		if (selectedCharacter.name.Contains("Summoner") && hub.canSummon())
+		if (selectedCharacter.name.Contains("Summoner") && hub.currentSummonerCanSummon())
 		{
 			list.Add("Summon");
 		}
@@ -244,8 +234,8 @@ public class Cursor : MonoBehaviour {
 		if (list.Count != 0)
 		{
 			cursorCanMove = false;
-			Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
-			hub.moveMenuHandler.MakeMoveMenu(list, pos);
+			Vector3 pos = transform.position + new Vector3(2 * HUB.SPACER, HUB.SPACER, 0);
+			hub.MOVE_MENU_CONTROLLER.MakeMoveMenu(list, pos);
 		}
 	}
 
@@ -261,7 +251,7 @@ public class Cursor : MonoBehaviour {
 		hub.enemyPositions.Clear();
 		canSelect = true;
 		cursorCanMove = true;
-		//remove the move tiles
+		//hub.Remove the move tiles
 		hub.RemoveTiles("MoveTile");
 	}
 	/*
@@ -276,7 +266,7 @@ public class Cursor : MonoBehaviour {
 		if (c != null && canSelect)
 		{
 			//if its that characters turn
-			if (c.playerNumber == turn.playerTurn)
+			if (c.playerNumber == Turns.getCurrentPlayerTurn())
 			{
 				//if they can still move
 				if (c.canMove)
@@ -288,13 +278,13 @@ public class Cursor : MonoBehaviour {
 					charOrgY = selectedCharacter.transform.position.y;
 				}
 				//if theyre a summoner, give them the chance to summon even if they cannot move
-				else if (c.name == "Summoner" && hub.canSummon())
+				else if (c.name == "Summoner" && hub.currentSummonerCanSummon())
 				{
 					cursorCanMove = false;
 					ArrayList list = new ArrayList();
 					list.Add("Summon");
-					Vector3 pos = transform.position + new Vector3(2 * spacer, spacer, 0);
-					hub.moveMenuHandler.MakeMoveMenu(list, pos);
+					Vector3 pos = transform.position + new Vector3(2 * HUB.SPACER, HUB.SPACER, 0);
+					hub.MOVE_MENU_CONTROLLER.MakeMoveMenu(list, pos);
 				}
 			}
 		}
@@ -303,8 +293,8 @@ public class Cursor : MonoBehaviour {
 			//if you select a character, put down move tiles
 			//put down the places this char can move
 			//save the original cooridinates incase we cancel the movement
-			orgX /= spacer;
-			orgY /= spacer;
+			orgX /= HUB.SPACER;
+			orgY /= HUB.SPACER;
 
 			int oX = realRound(orgX);
 			int oY = realRound(orgY);
@@ -316,7 +306,6 @@ public class Cursor : MonoBehaviour {
 		}
 	}
 
-
 	//limit the cursor to only move on the map
 	//x and y are in world space
 	void LimitToBounds()
@@ -327,17 +316,17 @@ public class Cursor : MonoBehaviour {
 		{
 		    tempX = 0;
 		} 
-		else if(transform.position.x > maxX)
+		else if(transform.position.x > hub.MAX_X)
 		{
-			tempX = maxX;
+			tempX = hub.MAX_X;
 		}
 		if (transform.position.y < 0)
 		{
 			tempY = 0;
 		}
-		else if (transform.position.y > maxY)
+		else if (transform.position.y > hub.MAX_Y)
 		{
-			tempY = maxY;
+			tempY = hub.MAX_Y;
 		}
 		transform.position = new Vector3(tempX, tempY, 0);
 	}
@@ -346,8 +335,8 @@ public class Cursor : MonoBehaviour {
 	bool LimitToMoveTiles()
 	{
 		bool returnable = false;
-		int tempX = realRound(transform.position.x/spacer);
-		int tempY = realRound(transform.position.y/spacer);
+		int tempX = realRound(transform.position.x/HUB.SPACER);
+		int tempY = realRound(transform.position.y/HUB.SPACER);
 
 		//may want to research more for a better find function here
 		GameObject[] moveTiles = GameObject.FindGameObjectsWithTag("MoveTile");
@@ -355,7 +344,7 @@ public class Cursor : MonoBehaviour {
 		//see if there is a move tile beneath you
 		for(int i = 0; i < moveTiles.Length; i++)
 		{
-			if(realRound(moveTiles[i].transform.position.x/spacer) == tempX && realRound(moveTiles[i].transform.position.y/spacer) == tempY)
+			if(realRound(moveTiles[i].transform.position.x/HUB.SPACER) == tempX && realRound(moveTiles[i].transform.position.y/HUB.SPACER) == tempY)
 			{
 				returnable = true;
 			}
@@ -363,39 +352,19 @@ public class Cursor : MonoBehaviour {
 		return returnable;
 	}
 
-	
-
 	//"pos" here is in grid space. 
 	public void MoveTo(Vector2 pos)
 	{
-		transform.position = new Vector2(pos.x * spacer, pos.y * spacer);
-	}
-
-	//Rounds each component of a vector2
-	Vector2 realRound(Vector2 f)
-	{
-		return new Vector2(realRound(f.x), realRound(f.y));
-	}
-	//Rounds numbers
-	int realRound(float f)
-	{
-		float tempF = f;
-		tempF -= (int)f;
-		tempF *= 10;
-		if((int)tempF > 4)
-		{
-			return (int)f + 1;
-		}
-		return (int)f;
+		transform.position = new Vector2(pos.x * HUB.SPACER, pos.y * HUB.SPACER);
 	}
 
 	//returns the in-grid x,y cooridnate of the cursor
 	public int getIntX()
 	{
-		return realRound(transform.position.x/spacer);
+		return realRound(transform.position.x/HUB.SPACER);
 	}
 	public int getIntY()
 	{
-		return realRound(transform.position.y / spacer);
+		return realRound(transform.position.y / HUB.SPACER);
 	}
 }

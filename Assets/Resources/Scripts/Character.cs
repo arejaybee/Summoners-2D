@@ -6,7 +6,7 @@ using UnityEngine;
  * Is the parent class for each summoned object
  * Deals with stats, statuses, materials of objects, and stuff you would see on each summon
  */ 
-public class Character : MonoBehaviour
+public class Character : AbstractScript
 {
 	public enum FACTIONS { LIGHT=0, DARK=1, EARTH=2, WEATHER=3};
 
@@ -31,7 +31,6 @@ public class Character : MonoBehaviour
 	public int faction;
 
 	//literally just to size/space based on cursor size
-	public HUB hub;
 	private float spacer;
 
 	// Use this for initialization
@@ -45,8 +44,7 @@ public class Character : MonoBehaviour
 		zeal = 0;
         hp = maxHp;
 		canMove = true;
-		hub = FindObjectOfType<HUB>();
-		spacer = hub.spacer;
+		spacer = HUB.SPACER;
 		iconPath = "Icons/" + name + "Icon";
 	}
 
@@ -80,7 +78,7 @@ public class Character : MonoBehaviour
 	public void CreateCharacter()
 	{
 		Start();
-		playerNumber = hub.turn.playerTurn;
+		playerNumber = Turns.getCurrentPlayerTurn();
 	
 	}
 
@@ -127,11 +125,11 @@ public class Character : MonoBehaviour
 			{
 				if (char2.name == "Summoner")
 				{
-					hub.getPlayer(char2.playerNumber).setLost(true);
+					getPlayer(char2.playerNumber).setLost(true);
 				}
 				else
 				{
-					hub.getPlayer(char2.playerNumber).getSummoner().mana += char2.cost / 2;
+					getPlayer(char2.playerNumber).getSummoner().mana += char2.cost / 2;
 				}
 			}
 		}
@@ -192,19 +190,6 @@ public class Character : MonoBehaviour
 	public int getIntY()
 	{
 		return realRound(transform.position.y / spacer);
-	}
-
-	//rounds numbers (I didnt like the inherent functions)
-	int realRound(float f)
-	{
-		float tempF = f;
-		tempF -= (int)f;
-		tempF *= 10;
-		if ((int)tempF > 4)
-		{
-			return (int)f + 1;
-		}
-		return (int)f;
 	}
 
 	public bool isAllyTo(Character c)

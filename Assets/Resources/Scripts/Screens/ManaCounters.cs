@@ -7,18 +7,16 @@ public class ManaCounters : MonoBehaviour
 	private string mana;
 	private int manaVal;
 	public int playerNumber;
-	private HUB hub;
 	// Use this for initialization
 	void Start ()
 	{
-		hub = GameObject.FindObjectOfType<HUB>();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 		//find the summoner corresponding to this manacounter,and set the counter to their mana total
-		Summoner sum = hub.getCurrentSummoner();
+		Summoner sum = Turns.getCurrentSummoner();
 		if(sum != null)
 		{
 			manaVal = sum.mana;

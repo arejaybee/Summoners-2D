@@ -11,8 +11,8 @@ public class Cloud : Character
 		base.Start();
 		maxHp = 10;
 		hp = 10;
-		move = 10;
-		attkRange = 10;
+		move = 7;
+		attkRange = 7;
 		attk = 10;
 		defense = 10;
 		cost = 10;

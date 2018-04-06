@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Turns : MonoBehaviour
+public class Turns : AbstractScript
 { 
 	public int numberOfPlayers = 1;
 	public bool firstTurn = true;
-	public int playerTurn;
+	public static int playerTurn;
 	public GameObject turnDisplay;
-	private HUB hub;
-	private Player player;
+	private static Player player;
 
 	// Use this for initialization
 	void Start ()
 	{
 		playerTurn = 1;
-		hub = GameObject.FindObjectOfType<HUB>();
 		turnDisplay = GameObject.Find("TurnDisplay");
-		player = hub.getPlayer(playerTurn);
+		player = getPlayer(playerTurn);
 		
 	}
 	
@@ -25,15 +23,15 @@ public class Turns : MonoBehaviour
 	void Update ()
 	{
 		//keep track of who's turn it is
-		player = hub.getPlayer(playerTurn);
+		player = getPlayer(playerTurn);
 		while(player.hasLost())
 		{
 			playerTurn++;
-			player = hub.getPlayer(playerTurn);
+			player = getPlayer(playerTurn);
 		}
 
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
-		if(player.getGamepad().isPressed("end") && hub.cursor.canSelect && !hub.cursor.summoning && !hub.cursor.attacking)
+		if(player.getGamepad().isPressed("end") && hub.CURSOR.canSelect && !hub.CURSOR.summoning && !hub.CURSOR.attacking)
 		{
 			if(firstTurn)
 			{
@@ -70,7 +68,7 @@ public class Turns : MonoBehaviour
 					if (chars[i].name == "Summoner")
 					{
 						((Summoner)chars[i]).mana += 5;//you get 5 mana every turn! (subject to change)
-						hub.cursor.transform.position = chars[i].transform.position;//put the cursor over the in-turn summoner
+						hub.CURSOR.transform.position = chars[i].transform.position;//put the cursor over the in-turn summoner
 					}
 				}
 			}
@@ -79,8 +77,18 @@ public class Turns : MonoBehaviour
 		turnDisplay.GetComponent<SpriteRenderer>().sprite = Resources.Load("Prefab/Turns/P"+playerTurn+"Turn",typeof(Sprite)) as Sprite;
 	}
 
-	public Player getPlayer()
+	public static Summoner getCurrentSummoner()
+	{
+		return getCurrentPlayer().getSummoner();
+	}
+
+
+	public static Player getCurrentPlayer()
 	{
 		return player;
+	}
+	public static int getCurrentPlayerTurn()
+	{
+		return playerTurn;
 	}
 }

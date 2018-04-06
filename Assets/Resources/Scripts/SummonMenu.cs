@@ -4,13 +4,12 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 
-public class SummonMenu : MonoBehaviour
+public class SummonMenu : AbstractScript
 {
 	public Character selectedChar;
 	public Object[] characterObjects;
-	public Character[] characters;
+	public Character[] summonableCharacters;
 	public List<SummonOption> summonOptions;
-	public HUB hub;
 	//this will make things easier for the player
 	public List<SummonOption> canAfford;
 	public List<SummonOption> cannotAfford;
@@ -23,26 +22,25 @@ public class SummonMenu : MonoBehaviour
 	void Start ()
 	{
 		canMove = false;
-		hub = GameObject.FindObjectOfType<HUB>();
 		characterObjects = Resources.LoadAll("Prefab/Characters/Units");
 
-		characters = new Character[characterObjects.Length];//set the character array to the same size as the number of objects
+		summonableCharacters = new Character[characterObjects.Length];//set the character array to the same size as the number of objects
 		for(int i = 0; i < characterObjects.Length; i++)
 		{
 			GameObject obj = GameObject.Instantiate((GameObject)characterObjects[i]);
-			characters[i] = obj.GetComponent<Character>();
-			characters[i].runStart();//to get values specified in the "start" function
+			summonableCharacters[i] = obj.GetComponent<Character>();
+			summonableCharacters[i].runStart();//to get values specified in the "start" function
 			GameObject.Destroy(obj);
 		}
 		index = 0;
 		startList = 0;
 		endList = 5;
 		summonOptions = new List<SummonOption>();
-		for(int i = 0; i < characters.Length; i++)
+		for(int i = 0; i < summonableCharacters.Length; i++)
 		{
 			//summonOptions.Add(new SummonOption());
 			summonOptions.Add(((GameObject)(GameObject.Instantiate(Resources.Load("Prefab/SummonMenu/SummonMenuOption")))).GetComponent<SummonOption>());
-			summonOptions[i].c = characters[i];// ((GameObject)characters[i]).GetComponent<Character>();
+			summonOptions[i].c = summonableCharacters[i];// ((GameObject)characters[i]).GetComponent<Character>();
 			summonOptions[i].Start();
 		}
 	}
@@ -67,7 +65,7 @@ public class SummonMenu : MonoBehaviour
 	 */ 
 	void fillStatPortion()
 	{
-		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\n\t\t\tZEAL: "+summonOptions[index].c.zeal+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+hub.getCurrentSummoner().mana;
+		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\n\t\t\tZEAL: "+summonOptions[index].c.zeal+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+Turns.getCurrentSummoner().mana;
 		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
 		GameObject.Find("StatDisplay").transform.Find("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
 	}
@@ -82,7 +80,7 @@ public class SummonMenu : MonoBehaviour
 		cannotAfford.Clear();
 		for(int i = 0; i < summonOptions.Count; i++)
 		{
-			if(summonOptions[i].c.cost > hub.getCurrentSummoner().mana)
+			if(summonOptions[i].c.cost > Turns.getCurrentSummoner().mana)
 			{
 				summonOptions[i].GetComponent<SpriteRenderer>().color = Color.black;
 				cannotAfford.Add(summonOptions[i]);
@@ -141,9 +139,9 @@ public class SummonMenu : MonoBehaviour
 	{
 		summonOptions[index].GetComponent<SpriteRenderer>().color = Color.green;
 		//move down the list
-		if(hub.turn.getPlayer().getGamepad().isPressed("down") && Time.time - hub.lastTimeDown >= 0.1f)
+		if(Turns.getCurrentPlayer().getGamepad().isPressed("down") && Time.time - hub.LAST_TIME_DOWN >= 0.1f)
 		{
-			hub.lastTimeDown = Time.time;
+			hub.LAST_TIME_DOWN = Time.time;
 			if(index+1 < summonOptions.Count)
 			{
 				summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
@@ -152,9 +150,9 @@ public class SummonMenu : MonoBehaviour
 			}
 		}
 		//move up the list
-		else if(hub.turn.getPlayer().getGamepad().isPressed("up") && Time.time - hub.lastTimeUp >= 0.1f)
+		else if(Turns.getCurrentPlayer().getGamepad().isPressed("up") && Time.time - hub.LAST_TIME_UP >= 0.1f)
 		{
-			hub.lastTimeUp = Time.time;
+			hub.LAST_TIME_UP = Time.time;
 			if(index-1 > -1)
 			{
 				summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
@@ -163,24 +161,24 @@ public class SummonMenu : MonoBehaviour
 			}
 		}
 		//select a character
-		else if(hub.turn.getPlayer().getGamepad().isPressed("confirm"))
+		else if(Turns.getCurrentPlayer().getGamepad().isPressed("confirm"))
 		{
-			hub.lastTimeZ = Time.time;
+			hub.LAST_TIME_CONFIRM = Time.time;
 			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
-			if (selectedChar.cost <= hub.getCurrentSummoner().mana)
+			if (selectedChar.cost <= Turns.getCurrentSummoner().mana)
 			{
 				SummonCharacter(selectedChar);
 			}
 		}
 		//go back to the map
-		else if(hub.turn.getPlayer().getGamepad().isPressed("cancel"))
+		else if(Turns.getCurrentPlayer().getGamepad().isPressed("cancel"))
 		{
-			hub.lastTimeX = Time.time;
+			hub.LAST_TIME_CANCEL = Time.time;
 			summonOptions[index].GetComponent<SpriteRenderer>().color = Color.white;
 			canMove = false;
-			hub.cam.moveCamera(hub.cursor.transform.position);
-			hub.cam.toggleChildren();
-			hub.moveMenuHandler.canMove = true;
+			hub.CAMERA_CONTROLLER.moveCamera(hub.CURSOR.transform.position);
+			hub.CAMERA_CONTROLLER.toggleChildren();
+			hub.MOVE_MENU_CONTROLLER.canMove = true;
 		}
 	}
 
@@ -189,38 +187,38 @@ public class SummonMenu : MonoBehaviour
 		//set this menu's canMove flag.
 		canMove = false;
 		//set the other can move flags.
-		hub.moveMenuHandler.canMove = false;
+		hub.MOVE_MENU_CONTROLLER.canMove = false;
 
 		//make an instance of this character
 		GameObject createdCharacter = (GameObject)GameObject.Instantiate(Resources.Load("Prefab/Characters/Units/" + c.name));
 		createdCharacter.GetComponent<Character>().CreateCharacter();
-		hub.getCurrentSummoner().mana -= c.cost;
+		Turns.getCurrentSummoner().mana -= c.cost;
 		
 
 		//make tiles showing where they can summon
 		hub.MakeTiles("SummonTile");
 
 		//put that character onto the cursor
-		hub.cursor.MoveTo((Vector2)hub.summonPositions[0]);
-		createdCharacter.transform.position = hub.cursor.transform.position;
+		hub.CURSOR.MoveTo((Vector2)hub.summonPositions[0]);
+		createdCharacter.transform.position = hub.CURSOR.transform.position;
 
 		//tell the cursor to stop caring about the summoner (if it did)
-		if (hub.cursor.selectedCharacter != null)
+		if (hub.CURSOR.selectedCharacter != null)
 		{
-			hub.cursor.selectedCharacter.canMove = false;
-			hub.cursor.selectedCharacter = null;
+			hub.CURSOR.selectedCharacter.canMove = false;
+			hub.CURSOR.selectedCharacter = null;
 		}
 		//assign the cursor to the character
-		hub.cursor.canSelect = false;
-		hub.cursor.summoning = true;
-		hub.cursor.selectedCharacter = createdCharacter.GetComponent<Character>();
+		hub.CURSOR.canSelect = false;
+		hub.CURSOR.summoning = true;
+		hub.CURSOR.selectedCharacter = createdCharacter.GetComponent<Character>();
 		//let Confirm button place the character and delete the tiles(done in cursor)
 
 		//move the camera
-		hub.cam.moveCamera(hub.cursor.transform.position);
-		hub.cam.toggleChildren(true);
-		hub.cursor.confirmFromMoveMenu();
-		hub.moveMenuHandler.removeMenu();
+		hub.CAMERA_CONTROLLER.moveCamera(hub.CURSOR.transform.position);
+		hub.CAMERA_CONTROLLER.toggleChildren(true);
+		hub.CURSOR.confirmFromMoveMenu();
+		hub.MOVE_MENU_CONTROLLER.removeMenu();
 		
 
 	}
