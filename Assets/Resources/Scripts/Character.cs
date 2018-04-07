@@ -51,24 +51,6 @@ public class Character : AbstractScript
     // Update is called once per frame
     protected virtual void Update ()
     {
-		//at 0hp, they die!
-		if (hp <= 0f)
-        {
-            Destroy(this.gameObject);
-        }
-		//if your zeal drops below 0, you swap teams
-		if (zeal < 0)
-		{
-			if(playerNumber == 1)
-			{
-				playerNumber = 2;
-			}
-			else
-			{
-				playerNumber = 1;
-			}
-			zeal *= -1;
-		}
 	}
 	public void runStart()
 	{
@@ -79,6 +61,23 @@ public class Character : AbstractScript
 	{
 		Start();
 		playerNumber = Turns.getCurrentPlayerTurn();
+	}
+
+	public void loseHP(int amt)
+	{
+		hp -= amt;
+		if(hp < 0f)
+		{
+			if (name == "Summoner")
+			{
+				getPlayer(playerNumber).setLost(true);
+			}
+			else
+			{
+				getPlayer(playerNumber).getSummoner().addMana(cost / 2);
+			}
+			Destroy(this.gameObject);
+		}
 	}
 
 	/*
@@ -112,24 +111,11 @@ public class Character : AbstractScript
 		{
 			if (char1.piercing)//with piecing, characters can simply ignore an opponents defence
 			{
-				char2.hp -= char1.attk;
+				char2.loseHP(char1.attk);
 			}
 			else
 			{
-				char2.hp = char2.hp - Mathf.Max(char1.attk - char2.defense, 0); //dont do negative damage, but try to attack!
-			}
-
-			//players get some mana back if their unit dies
-			if (char2.hp <= 0)
-			{
-				if (char2.name == "Summoner")
-				{
-					getPlayer(char2.playerNumber).setLost(true);
-				}
-				else
-				{
-					getPlayer(char2.playerNumber).getSummoner().mana += char2.cost / 2;
-				}
+				char2.loseHP(Mathf.Max(char1.attk - char2.defense, 0)); //dont do negative damage, but try to attack!
 			}
 		}
 	}

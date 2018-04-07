@@ -65,6 +65,7 @@ public class SummonMenu : AbstractScript
 	 */ 
 	void fillStatPortion()
 	{
+		print("hit!");
 		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\n\t\t\tZEAL: "+summonOptions[index].c.zeal+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+Turns.getCurrentSummoner().mana;
 		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
 		GameObject.Find("StatDisplay").transform.Find("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
@@ -196,6 +197,7 @@ public class SummonMenu : AbstractScript
 		//make tiles showing where they can summon
 		hub.MakeTiles("SummonTile");
 
+		hub.CURSOR.selectedCharacter = null;
 		//put that character onto the cursor
 		hub.CURSOR.MoveToGridSpace((Vector2)hub.summonPositions[0]);
 		Character chara = hub.makeCharacter(c.name, hub.CURSOR.transform.position);
