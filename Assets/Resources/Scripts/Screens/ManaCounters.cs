@@ -11,24 +11,11 @@ public class ManaCounters : MonoBehaviour
 	void Start ()
 	{
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+	public void setMana(int theMana)
 	{
-		//find the summoner corresponding to this manacounter,and set the counter to their mana total
-		Summoner sum = Turns.getCurrentSummoner();
-		if(sum != null)
-		{
-			manaVal = sum.mana;
-		}
-		else
-		{
-			manaVal = 0;
-		}
+		manaVal = theMana;
 		mana = "Mana\n\n" + manaVal.ToString("D4");//D4 means the number will have 4 digits eg: 2 -> 0002
-		if (sum.playerNumber == playerNumber)
-		{
-			transform.Find("Mana").GetComponent<TextMesh>().text = mana;
-		}
+		transform.Find("Mana").GetComponent<TextMesh>().text = mana;
 	}
 }

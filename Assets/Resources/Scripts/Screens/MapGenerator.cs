@@ -9,13 +9,13 @@ public class MapGenerator : AbstractScript
 	public int boundsX;
 	public int boundsY;
 	private ArrayList summoners;
-	private GameObject sum1;
-	private GameObject sum2;
+	private Summoner sum1;
+	private Summoner sum2;
 	// Use this for initialization
 	void Start ()
 	{
-		sum1 = hub.players[0].getSummoner().gameObject;
-		sum2 = hub.players[1].getSummoner().gameObject;
+		sum1 = hub.players[0].getSummoner();
+		sum2 = hub.players[1].getSummoner();
 
 		//Eventually, I want to be able to pass in a string and have that string be built. So that I can have several pre-built maps that are set to this variable.
 		string tempMap = "MMMGGGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMMMGGGGGGGGGGGGGGGG MMMMGGGGGGGGGGGGGGGGG MMMGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGWWGGGGGGGGGGGG GGGGGGGGWWGGGGGGGGGGG GGGGGGGGGWWGGGGGGGGGG GGGGGGGGGGWWWWGGGGGGG GGGGGGGGGWWWWWGGGGGGG GGGGGGGGGGGGGWGGGGGGG GGGGGGGGGGGGGGWGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG GGGGGGGGGGWWWWWWGGGGG";
@@ -77,8 +77,9 @@ public class MapGenerator : AbstractScript
 			}
 		}
 		//add summoners
-		sum1.transform.position = new Vector3(0, HUB.SPACER * (int)(n.Length / 2), 0);
-		hub.CURSOR.MoveTo(worldToGrid(sum1.transform.position));
-		sum2.transform.position = new Vector3(HUB.SPACER * (int)(n[0].Length - 1), HUB.SPACER * (int)(n.Length / 2), 0);
+		hub.moveCharacter(sum1, new Vector2(0, HUB.SPACER * (int)(n.Length / 2)));
+		hub.moveCharacter(sum2, new Vector2(HUB.SPACER * (int)(n[0].Length - 1), HUB.SPACER * (int)(n.Length / 2)));
+
+		hub.CURSOR.MoveToWorldSpace(sum1.transform.position);
 	}
 }

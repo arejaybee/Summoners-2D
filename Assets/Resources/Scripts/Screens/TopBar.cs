@@ -5,50 +5,30 @@ using UnityEngine;
 public class TopBar : MonoBehaviour
 {
 	public Character selectedChar;
-	private Cursor cursor;
-	private Character[] chars;
 	private GameObject topBar;
+	private HUB hub;
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
-		cursor = FindObjectOfType<Cursor>();
-		chars = FindObjectsOfType<Character>();
-		topBar = GameObject.Find("TopBar");
+		hub = FindObjectOfType<HUB>();
+		topBar = GameObject.Find("TopBar"); //cannot get the gameobject by using "this" for some reason...
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 		//see if the cursor is on a character
-		chars = FindObjectsOfType<Character>();
 		SummonMenu summonMenu = GameObject.FindObjectOfType<SummonMenu>();
-		if (isCursorOnCharacter() && !summonMenu.canMove)
-		{
-			//if so there is a bar, and it needs info
-			topBar.SetActive(true);
-			FillTopInfo();
-		}
-		//there is no bar otherwise
-		else
-		{
-			topBar.SetActive(false);
-		}
 	}
 
-	//if the cursor is currently on the same tile as a character, return true
-	bool isCursorOnCharacter()
+	public void setTopBarActive(bool flag, Character c)
 	{
-		int curX = cursor.getIntX();
-		int curY = cursor.getIntY();
-		for(int i = 0; i < chars.Length; i++)
+		topBar.SetActive(flag);
+		selectedChar = c;
+		if (flag)
 		{
-			if (chars[i].getIntX() == curX && chars[i].getIntY() == curY)
-			{
-				selectedChar = chars[i];
-				return true;
-			}
+			FillTopInfo();
 		}
-		return false;
 	}
 
 	//display information about the character that the cursor is on.

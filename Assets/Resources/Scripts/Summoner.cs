@@ -10,6 +10,7 @@ public class Summoner : Character {
 	public int numUnits;
 	public int summonRange;
 	public int mana;
+	public ManaCounters manaCounter;
 	// Use this for initialization
 	protected override void Start ()
 	{
@@ -29,9 +30,19 @@ public class Summoner : Character {
 		canUseZeal = true;
 		armySize = 10;
 		numUnits = 0;
+
+		ManaCounters[] mc = FindObjectsOfType<ManaCounters>();
+		foreach (ManaCounters m in mc)
+		{
+			if (m.playerNumber == playerNumber)
+			{
+				manaCounter = m;
+			}
+		}
+
 		if (playerNumber == 1)
 		{
-			mana = 5;
+			addMana(5);
 		}
 		else
 		{
@@ -39,10 +50,18 @@ public class Summoner : Character {
 		}
 		topBarDescription = "These masters of magic summon armies to fight for them.\nIf you lose this unit, you lose!";
 	}
-	protected override void Update()
+	public void addMana(int manaAmt)
 	{
-		base.Update();
+		mana += manaAmt;
 		mana = Mathf.Max(mana, 0);
+		manaCounter.setMana(mana);
+	}
+	public void spendMana(int cost)
+	{
+		if(mana > cost)
+			mana -= cost;
+		mana = Mathf.Max(mana, 0);
+		manaCounter.setMana(mana);
 	}
 	
 }

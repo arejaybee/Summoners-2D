@@ -79,7 +79,6 @@ public class Character : AbstractScript
 	{
 		Start();
 		playerNumber = Turns.getCurrentPlayerTurn();
-	
 	}
 
 	/*

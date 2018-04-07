@@ -24,7 +24,7 @@ public class Cursor : AbstractScript {
 		cursorCanMove = true;
 		summoning = false;
 		attacking = false;
-		MoveTo(worldToGrid(Turns.getCurrentSummoner().transform.position));
+		MoveToWorldSpace(Turns.getCurrentSummoner().transform.position);
 	}
 	// Update is called once per frame
 	void Update ()
@@ -61,15 +61,29 @@ public class Cursor : AbstractScript {
 			}
 		}
 
-		//move the selected character with the cursor
-		if (selectedCharacter != null)
-		{
-			selectedCharacter.gameObject.transform.position = transform.position;
-		}
-
 
 	}
 
+	private bool isOnCharacter()
+	{
+		if (!cursorCanMove) {
+			hub.TOP_BAR.setTopBarActive(false, null);
+			return false;
+		}
+		int index = 0;
+		foreach(Vector2 pos in hub.characterPositions)
+		{
+			if(pos == (Vector2)transform.position)
+			{
+				Character c = (Character)hub.characters[index];
+				hub.TOP_BAR.setTopBarActive(true, c);
+				return true;
+			}
+			index++;
+		}
+		hub.TOP_BAR.setTopBarActive(false, null);
+		return false;
+	}
 	//used to move the cursor
 	void DetectMovement()
 	{
@@ -155,7 +169,7 @@ public class Cursor : AbstractScript {
 			hub.LAST_TIME_CANCEL = Time.time;
 			if (!canSelect)
 			{
-				selectedCharacter.transform.position = new Vector3(charOrgX, charOrgY, 0);
+				hub.moveCharacter(selectedCharacter, new Vector3(charOrgX, charOrgY, 0));
 			}
 			if (selectedCharacter != null)
 			{
@@ -170,7 +184,7 @@ public class Cursor : AbstractScript {
 		}
 
 		hub.CAMERA_CONTROLLER.moveCamera(transform.position+mv);
-		transform.position += mv;
+		MoveToWorldSpace(transform.position + mv);
 	}
 
 	bool isOnTile(string name)
@@ -328,7 +342,7 @@ public class Cursor : AbstractScript {
 		{
 			tempY = hub.MAX_Y;
 		}
-		transform.position = new Vector3(tempX, tempY, 0);
+		MoveToWorldSpace(new Vector3(tempX, tempY, 0));
 	}
 
 	//limit the cursor to only move over movement tiles
@@ -353,14 +367,34 @@ public class Cursor : AbstractScript {
 	}
 
 	//"pos" here is in grid space. 
-	public void MoveTo(Vector2 pos)
+	public void MoveToGridSpace(Vector2 pos)
 	{
+	
 		transform.position = new Vector2(pos.x * HUB.SPACER, pos.y * HUB.SPACER);
+		//move the selected character with the cursor
+		if (selectedCharacter != null && selectedCharacter.gameObject.transform.position != transform.position)
+		{
+			hub.moveCharacter(selectedCharacter, transform.position);
+		}
+		isOnCharacter();
+	}
+
+	public void MoveToWorldSpace(Vector2 pos)
+	{
+	
+		transform.position = pos;
+		//move the selected character with the cursor
+		if (selectedCharacter != null && selectedCharacter.gameObject.transform.position != transform.position)
+		{
+			hub.moveCharacter(selectedCharacter, transform.position);
+		}
+		isOnCharacter();
 	}
 
 	//returns the in-grid x,y cooridnate of the cursor
 	public int getIntX()
 	{
+
 		return realRound(transform.position.x/HUB.SPACER);
 	}
 	public int getIntY()

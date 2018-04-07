@@ -21,6 +21,7 @@ public class HUB : MonoBehaviour{
 	public MoveMenuController MOVE_MENU_CONTROLLER;
 	public MapGenerator MAP_GENERATOR;
 	public CameraController CAMERA_CONTROLLER;
+	public TopBar TOP_BAR;
 
 	public float LAST_TIME_CANCEL;
 	public float LAST_TIME_CONFIRM;
@@ -48,8 +49,8 @@ public class HUB : MonoBehaviour{
 		MOVE_MENU_CONTROLLER = GameObject.FindObjectOfType<MoveMenuController>();
 		MAP_GENERATOR = GameObject.FindObjectOfType<MapGenerator>();
 		CAMERA_CONTROLLER = GameObject.FindObjectOfType<CameraController>();
-
-			LAST_TIME_CANCEL = Time.time;
+		TOP_BAR = GameObject.FindObjectOfType<TopBar>();
+		LAST_TIME_CANCEL = Time.time;
 			LAST_TIME_CONFIRM = Time.time;
 			LAST_TIME_UP = Time.time;
 			LAST_TIME_DOWN = Time.time;
@@ -69,8 +70,7 @@ public class HUB : MonoBehaviour{
 			for (int i = 0; i < players.Length; i++)
 			{
 				players[i] = new Player(i + 1);
-				GameObject summoner = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
-				summoner.GetComponent<Summoner>().setPlayerNum(i + 1);
+				Summoner summoner = makeSummoner(i + 1, new Vector2(0,0));
 				players[i].setSummoner(summoner.GetComponent<Summoner>());
 				players[i].setGamePad(new Gamepad("keyboard"));
 			}
@@ -127,6 +127,40 @@ public class HUB : MonoBehaviour{
 			characters.Add((Character)chars[i]);
 			characterPositions.Add(roundPosition(chars[i].transform.position));
 		}
+	}
+
+	public void moveCharacter(Character c, Vector2 pos)
+	{
+		for(int i =0; i < characters.Count; i++)
+		{
+			if(c.Equals(characters[i]))
+			{
+				characterPositions[i] = pos;
+			}
+		}
+		c.transform.position = pos;
+	}
+
+	public Character makeCharacter(string name, Vector2 pos)
+	{
+		GameObject characterObj = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Units/" + name)));
+		characterObj.transform.position = pos;
+		Character c = characterObj.GetComponent<Character>();
+		c.CreateCharacter();
+		characters.Add(c);
+		characterPositions.Add(pos);
+		return c;
+	}
+
+	public Summoner makeSummoner(int playerNum, Vector2 pos)
+	{
+		GameObject summoner = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
+		Summoner s = summoner.GetComponent<Summoner>();
+		s.setPlayerNum(playerNum);
+		characters.Add(s);
+		characterPositions.Add(pos);
+
+		return s;
 	}
 
 

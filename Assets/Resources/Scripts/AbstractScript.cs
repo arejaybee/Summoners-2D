@@ -12,6 +12,10 @@ public class AbstractScript : MonoBehaviour {
 
 	public Player getPlayer(int num)
 	{
+		if(num > hub.players.Length)
+		{
+			num = 1;
+		}
 		return hub.players[num - 1];
 	}
 
@@ -27,6 +31,11 @@ public class AbstractScript : MonoBehaviour {
 		int x = realRound(worldCoord.x / HUB.SPACER);
 		int y = realRound(worldCoord.y / HUB.SPACER);
 		return new Vector2(x, y);
+	}
+
+	protected bool compareVectors(Vector2 v1, Vector2 v2)
+	{
+		return v1 == v2;
 	}
 
 	/*

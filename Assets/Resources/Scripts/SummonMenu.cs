@@ -190,17 +190,15 @@ public class SummonMenu : AbstractScript
 		hub.MOVE_MENU_CONTROLLER.canMove = false;
 
 		//make an instance of this character
-		GameObject createdCharacter = (GameObject)GameObject.Instantiate(Resources.Load("Prefab/Characters/Units/" + c.name));
-		createdCharacter.GetComponent<Character>().CreateCharacter();
-		Turns.getCurrentSummoner().mana -= c.cost;
+		Turns.getCurrentSummoner().spendMana(c.cost);
 		
 
 		//make tiles showing where they can summon
 		hub.MakeTiles("SummonTile");
 
 		//put that character onto the cursor
-		hub.CURSOR.MoveTo((Vector2)hub.summonPositions[0]);
-		createdCharacter.transform.position = hub.CURSOR.transform.position;
+		hub.CURSOR.MoveToGridSpace((Vector2)hub.summonPositions[0]);
+		Character chara = hub.makeCharacter(c.name, hub.CURSOR.transform.position);
 
 		//tell the cursor to stop caring about the summoner (if it did)
 		if (hub.CURSOR.selectedCharacter != null)
@@ -211,7 +209,7 @@ public class SummonMenu : AbstractScript
 		//assign the cursor to the character
 		hub.CURSOR.canSelect = false;
 		hub.CURSOR.summoning = true;
-		hub.CURSOR.selectedCharacter = createdCharacter.GetComponent<Character>();
+		hub.CURSOR.selectedCharacter = chara;
 		//let Confirm button place the character and delete the tiles(done in cursor)
 
 		//move the camera
