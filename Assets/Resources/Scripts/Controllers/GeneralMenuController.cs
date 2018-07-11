@@ -43,61 +43,49 @@ public class GeneralMenuController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetButtonDown("Cancel"))
-		{
-			if (currentMenu == settingsMenu)
-			{
+		if (Input.GetButtonDown("Cancel")){
+			if (currentMenu == settingsMenu){
 				ShowSettingsMenu(false);
 			}
 		}
 	}
 
 	//changes the scene to some new screen
-	public void ChangeScene(string name)
-	{
+	public void ChangeScene(string name){
 		print(name);
 		Scene myScene = SceneManager.GetSceneByName(name);
-		if (!myScene.isLoaded)
-		{
+		if (!myScene.isLoaded){
 			SceneManager.LoadScene(name);
 		}
 
-		if (myScene.isLoaded && myScene.IsValid())
-		{
+		if (myScene.isLoaded && myScene.IsValid()){
 			SceneManager.SetActiveScene(myScene);
 		}
 	}
 
-	public void Exit()
-	{
+	public void Exit(){
 		Application.Quit();
 	}
 
 	//Shows the pause menu
-	public void ShowRootMenu(bool state)
-	{
-		if (rootMenu != null)
-		{
+	public void ShowRootMenu(bool state){
+		if (rootMenu != null){
 			rootMenu.SetActive(state);
 		}
 	}
 
 	//Displays the settings
-	public void ShowSettingsMenu(bool state)
-	{
-		if (settingsMenu != null)
-		{
-			if (state)
-			{
+	public void ShowSettingsMenu(bool state){
+		if (settingsMenu != null){
+			if (state){
 				settingsMenu.SetActive(state);
 				currentMenu = settingsMenu;
-				//settingsMenu.GetComponent<SettingsMenu>().Master = this;
-				//settingsMenu.GetComponent<SettingsMenu>().Focus(true);
+				settingsMenu.GetComponent<SettingsMenu>().Master = this;
+				settingsMenu.GetComponent<SettingsMenu>().Focus(true);
 				navigator.SetSelectedGameObject(settingsMenu.transform.GetChild(1).gameObject);
 			}
-			else
-			{
-				//settingsMenu.GetComponent<SettingsMenu>().Focus(false);
+			else{
+				settingsMenu.GetComponent<SettingsMenu>().Focus(false);
 				settingsMenu.SetActive(false);
 				currentMenu = rootMenu;
 				navigator.SetSelectedGameObject(rootMenu.transform.GetChild(1).gameObject);
@@ -105,8 +93,7 @@ public class GeneralMenuController : MonoBehaviour {
 		}
 	}
 
-	public void changePlayerNumber(int num)
-	{
+	public void changePlayerNumber(int num){
 		settings.numPlayers = num;
 	}
 
