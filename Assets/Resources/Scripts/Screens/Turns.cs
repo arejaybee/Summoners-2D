@@ -28,7 +28,7 @@ public class Turns : AbstractScript
 		}
 
 		//you cannot end your turn if you are summoning, attacking, or moving a unit
-		if(player.getGamepad().isPressed("end") && hub.CURSOR.canSelect && !hub.CURSOR.summoning && !hub.CURSOR.attacking)
+		if(player.getGamepad().isPressed("end") && hub.CURSOR.canSelect && !hub.CURSOR.summoning && !hub.CURSOR.attacking && !PauseMenuController.isPaused)
 		{
 			if (firstTurn)
 			{

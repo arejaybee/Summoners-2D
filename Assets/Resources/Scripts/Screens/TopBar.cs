@@ -6,19 +6,10 @@ public class TopBar : MonoBehaviour
 {
 	public Character selectedChar;
 	private GameObject topBar;
-	private HUB hub;
 	// Use this for initialization
 	void Awake ()
 	{
-		hub = FindObjectOfType<HUB>();
 		topBar = GameObject.Find("TopBar"); //cannot get the gameobject by using "this" for some reason...
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		//see if the cursor is on a character
-		SummonMenu summonMenu = GameObject.FindObjectOfType<SummonMenu>();
 	}
 
 	public void setTopBarActive(bool flag, Character c)

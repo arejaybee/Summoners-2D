@@ -13,7 +13,7 @@ public class SummonMenu : AbstractScript
 	//this will make things easier for the player
 	public List<SummonOption> canAfford;
 	public List<SummonOption> cannotAfford;
-	public bool canMove;
+	public static bool canMove;
 
 	private int index;
 	private int startList;
@@ -48,7 +48,7 @@ public class SummonMenu : AbstractScript
 	// Update is called once per frame
 	void Update ()
 	{
-		if (canMove)//dont worry about any of this unless a player is on this menu
+		if (canMove && !PauseMenuController.isPaused)//dont worry about any of this unless a player is on this menu
 		{
 			selectedChar = summonOptions[index].c;
 			fillStatPortion();
@@ -65,7 +65,6 @@ public class SummonMenu : AbstractScript
 	 */ 
 	void fillStatPortion()
 	{
-		print("hit!");
 		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\n\t\t\tZEAL: "+summonOptions[index].c.zeal+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+Turns.getCurrentSummoner().mana;
 		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
 		GameObject.Find("StatDisplay").transform.Find("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
@@ -179,7 +178,7 @@ public class SummonMenu : AbstractScript
 			canMove = false;
 			hub.CAMERA_CONTROLLER.moveCamera(hub.CURSOR.transform.position);
 			hub.CAMERA_CONTROLLER.toggleChildren();
-			hub.MOVE_MENU_CONTROLLER.canMove = true;
+			MoveMenuController.canMove = true;
 		}
 	}
 
@@ -188,7 +187,7 @@ public class SummonMenu : AbstractScript
 		//set this menu's canMove flag.
 		canMove = false;
 		//set the other can move flags.
-		hub.MOVE_MENU_CONTROLLER.canMove = false;
+		MoveMenuController.canMove = false;
 
 		//make an instance of this character
 		Turns.getCurrentSummoner().spendMana(c.cost);

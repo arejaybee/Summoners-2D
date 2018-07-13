@@ -6,7 +6,7 @@ public class MoveMenuController : AbstractScript
 {
 	ArrayList menuItems;//all of the menu items
 	private int selectedItem;//the current menu item that is highlighted
-	public bool canMove;
+	public static bool canMove;
 
 
 	// Use this for initialization
@@ -63,7 +63,7 @@ public class MoveMenuController : AbstractScript
 
 				//find a way to cancel and go back
 				removeMenu();
-				hub.CURSOR.cursorCanMove = true;
+				Cursor.cursorCanMove = true;
 			}
 		}
 	}
@@ -136,7 +136,7 @@ public class MoveMenuController : AbstractScript
 	public void beginSummoning()
 	{
 		canMove = false;
-		GameObject.FindObjectOfType<SummonMenu>().canMove = true;
+		SummonMenu.canMove = true;
 		hub.CAMERA_CONTROLLER.toggleChildren();
 		hub.CAMERA_CONTROLLER.goToSummonMenu();
 	}
@@ -147,7 +147,7 @@ public class MoveMenuController : AbstractScript
 		hub.MakeTiles("EnemyTile");
 		//set cursor flag to know it needs to attack
 		hub.CURSOR.attacking = true;
-	    hub.CURSOR.cursorCanMove = true;
+	    Cursor.cursorCanMove = true;
 		removeMenu();
 	}
 	public void beginSpeaking()
@@ -159,7 +159,7 @@ public class MoveMenuController : AbstractScript
 				hub.CURSOR.selectedCharacter.speak((Character)hub.charsInRange[i]);
 			}
 		}
-		hub.CURSOR.cursorCanMove = true;
+		Cursor.cursorCanMove = true;
 		hub.CURSOR.confirmFromMoveMenu();
 		removeMenu();
 	}

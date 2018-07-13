@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cursor : AbstractScript {
-	public bool cursorCanMove;
+	public static bool cursorCanMove;
 	public bool canSelect;//if this is true, we can pick up a unit
 	public bool summoning;
 	public bool attacking;
@@ -35,7 +35,7 @@ public class Cursor : AbstractScript {
 		orgY = transform.position.y;
 
 		//if the cursor can move, see if it is being moved
-		if (cursorCanMove)
+		if (cursorCanMove && !PauseMenuController.isPaused)
 		{
 			DetectMovement();
 		}
