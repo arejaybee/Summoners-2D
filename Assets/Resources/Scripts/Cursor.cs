@@ -9,10 +9,10 @@ public class Cursor : AbstractScript {
 	public bool summoning;
 	public bool attacking;
 	public Character selectedCharacter;
-	private float orgX, orgY;
-	private float charOrgX, charOrgY;
+	private MapTile charOrgMapTile;
 	private Character unselectableSummoner;
 	private Character fightingCharacter;
+	public MapTile onMapTile;
 
 	// Use this for initialization
 	void Start()
@@ -24,16 +24,10 @@ public class Cursor : AbstractScript {
 		cursorCanMove = true;
 		summoning = false;
 		attacking = false;
-		MoveToWorldSpace(Turns.getCurrentSummoner().transform.position);
 	}
 	// Update is called once per frame
 	void Update ()
 	{
-	
-		//record the x,y cooridinate the cursor is at currently
-		orgX = transform.position.x;
-		orgY = transform.position.y;
-
 		//if the cursor can move, see if it is being moved
 		if (cursorCanMove && !PauseMenuController.isPaused)
 		{
@@ -41,13 +35,6 @@ public class Cursor : AbstractScript {
 		}
 		//MouseMovement();
 		//MobileTouchMovement();
-
-		//if there is no character selected, the cursor can go anywhere within the map's bounds
-		//If we are summoning, there will also be no limit to where the cursor can move. This was done because
-		//there will be cases where some summon tiles are cut off from the rest, so moving to them will be harder with bounds.
-		//I am doing the same thing I did with summoning for attacking. It just makes things easier on my end for now
-		LimitToBounds();
-
 
 		//when the cursor switches to attack mode, we need to know which 
 		//character is attacking, but also dont want to move the character.
@@ -60,62 +47,60 @@ public class Cursor : AbstractScript {
 				selectedCharacter = null;
 			}
 		}
-
-
 	}
 
 	private bool isOnCharacter()
 	{
-		if (!cursorCanMove) {
+		if (!cursorCanMove)
+		{
 			hub.TOP_BAR.setTopBarActive(false, null);
 			return false;
 		}
-		int index = 0;
-		foreach(Vector2 pos in hub.characterPositions)
+		if(onMapTile.getCharacterOnTile() != null)
 		{
-			if(pos == (Vector2)transform.position)
-			{
-				Character c = (Character)hub.characters[index];
-				hub.TOP_BAR.setTopBarActive(true, c);
-				return true;
-			}
-			index++;
+			hub.TOP_BAR.setTopBarActive(true, hub.CURSOR.getOnMapTile().getCharacterOnTile());
+			return true;
 		}
 		hub.TOP_BAR.setTopBarActive(false, null);
 		return false;
 	}
+
 	//used to move the cursor
 	void DetectMovement()
 	{
 		//mv shows where the cursor has moved to. This is so I can move the camera with the cursor
-		Vector3 mv= new Vector3(0,0,0);
+		Vector3 mv = transform.position;
 
 		//Each key only gives input every tenth of a second. This keeps the cursor
 		//moving smoothley
 
 		//up
-		if (Turns.getCurrentPlayer().getGamepad().isPressed("up") && Time.time - hub.LAST_TIME_UP >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("up") && onMapTile.getNorthTile() != null && Time.time - hub.LAST_TIME_UP >= 0.1f)
 		{
 			hub.LAST_TIME_UP = Time.time;
-			mv = new Vector3(0, HUB.SPACER, 0);
+			mv = onMapTile.getNorthTile().transform.position;
+			setOnMapTile(onMapTile.getNorthTile());
 		}
 		//down
-		if (Turns.getCurrentPlayer().getGamepad().isPressed("down") && Time.time - hub.LAST_TIME_DOWN >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("down") && onMapTile.getSouthTile() != null && Time.time - hub.LAST_TIME_DOWN >= 0.1f)
 		{
 			hub.LAST_TIME_DOWN = Time.time;
-			mv = new Vector3(0, -1*HUB.SPACER, 0);
+			mv = onMapTile.getSouthTile().transform.position;
+			setOnMapTile(onMapTile.getSouthTile());
 		}
 		//right
-		if (Turns.getCurrentPlayer().getGamepad().isPressed("right") && Time.time - hub.LAST_TIME_RIGHT >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("right") && onMapTile.getEastTile() != null && Time.time - hub.LAST_TIME_RIGHT >= 0.1f)
 		{
 			hub.LAST_TIME_RIGHT = Time.time;
-			mv = new Vector3(HUB.SPACER, 0, 0);
+			mv = onMapTile.getEastTile().transform.position;
+			setOnMapTile(onMapTile.getEastTile());
 		}
 		//left
-		if (Turns.getCurrentPlayer().getGamepad().isPressed("left") && Time.time - hub.LAST_TIME_LEFT >= 0.1f)
+		if (Turns.getCurrentPlayer().getGamepad().isPressed("left") && onMapTile.getWestTile() !=null && Time.time - hub.LAST_TIME_LEFT >= 0.1f)
 		{
 			hub.LAST_TIME_LEFT = Time.time;
-			mv = new Vector3(-1*HUB.SPACER, 0, 0);
+			mv = onMapTile.getWestTile().transform.position;
+			setOnMapTile(onMapTile = onMapTile.getWestTile());
 		}
 		
 		//for confirm and cancel, I wait a bit longer between inputs to help stop the game
@@ -146,13 +131,13 @@ public class Cursor : AbstractScript {
 			//if the player is currently trying to select an attack target
 			else if (attacking)
 			{
-				if(isOnTile("EnemyTile"))
+				if(isOnTile("EnemyTile") && onMapTile.getCharacterOnTile() != null)
 				{
 					canSelect = true;
 					attacking = false;
 					hub.RemoveTiles("EnemyTile");
 					//print(fightingCharacter.name);
-					fightingCharacter.fight(hub.findCharacterAt(transform.position));
+					fightingCharacter.fight(onMapTile.getCharacterOnTile());
 					confirmFromMoveMenu();
 				}
 			}
@@ -169,7 +154,7 @@ public class Cursor : AbstractScript {
 			hub.LAST_TIME_CANCEL = Time.time;
 			if (!canSelect)
 			{
-				hub.moveCharacter(selectedCharacter, new Vector3(charOrgX, charOrgY, 0));
+				hub.moveCharacter(selectedCharacter, charOrgMapTile);
 			}
 			if (selectedCharacter != null)
 			{
@@ -183,8 +168,7 @@ public class Cursor : AbstractScript {
 			hub.RemoveTiles("SummonTile");
 		}
 
-		hub.CAMERA_CONTROLLER.moveCamera(transform.position+mv);
-		MoveToWorldSpace(transform.position + mv);
+		hub.CAMERA_CONTROLLER.moveCamera(mv);
 	}
 
 	bool isOnTile(string name)
@@ -193,19 +177,19 @@ public class Cursor : AbstractScript {
 		switch(name)
 		{
 			case ("SummonTile"):
-				if(hub.summonPositions.Contains(new Vector2(getIntX(),getIntY())))
+				if(hub.summonPositions.Contains(onMapTile))
 				{
 					ret = true;
 				}
 				break;
 			case ("MoveTile"):
-				if (hub.moveTilePositions.Contains(new Vector2(getIntX(), getIntY())))
+				if (hub.moveTilePositions.Contains(onMapTile))
 				{
 					ret = true;
 				}
 				break;
 			case ("EnemyTile"):
-				if(hub.enemyPositions.Contains(new Vector2(getIntX(), getIntY())))
+				if(hub.enemyPositions.Contains(onMapTile))
 				{
 					ret = true;
 				}
@@ -231,15 +215,10 @@ public class Cursor : AbstractScript {
 		{
 			list.Add("Attack");
 		}
-		//if there are units around to hear you, you get the speak option
-		if (selectedCharacter.canUseZeal && hub.charactersInRange(selectedCharacter).Count > 0)
-		{
-			list.Add("Speak");
-		}
 		//add Heal
 
 		//you can only stop if there are no characters on the spot you are on.
-		if (hub.findCharactersOn(selectedCharacter).Count == 0)
+		if (onMapTile.getCharacterOnTile() != null)
 		{
 			list.Add("Stop");
 		}
@@ -274,7 +253,7 @@ public class Cursor : AbstractScript {
 	 * */
 	void DetectSelect()
 	{
-		Character c = hub.findCharacterAt((Vector2)transform.position);
+		Character c = onMapTile.getCharacterOnTile();
 
 		//if you hit a character, and you can select something
 		if (c != null && canSelect)
@@ -288,8 +267,7 @@ public class Cursor : AbstractScript {
 					//select them with the cursor
 					selectedCharacter = c;
 					canSelect = false;
-					charOrgX = selectedCharacter.transform.position.x;
-					charOrgY = selectedCharacter.transform.position.y;
+					charOrgMapTile = onMapTile;
 				}
 				//if theyre a summoner, give them the chance to summon even if they cannot move
 				else if (c.name == "Summoner" && hub.currentSummonerCanSummon())
@@ -304,91 +282,10 @@ public class Cursor : AbstractScript {
 		}
 		if (!canSelect) 
 		{
-			//if you select a character, put down move tiles
-			//put down the places this char can move
-			//save the original cooridinates incase we cancel the movement
-			orgX /= HUB.SPACER;
-			orgY /= HUB.SPACER;
-
-			int oX = realRound(orgX);
-			int oY = realRound(orgY);
-			//print("Character is at: " + oX + " , " + oY);
-
 			//displays all of the possible spaces that character can move to
-			hub.FindMoveTile(selectedCharacter.move, oX, oY,selectedCharacter,false);
+			hub.FindMoveTiles(selectedCharacter.move, onMapTile,selectedCharacter);
 			hub.MakeTiles("MoveTile");
 		}
-	}
-
-	//limit the cursor to only move on the map
-	//x and y are in world space
-	void LimitToBounds()
-	{
-		float tempX = transform.position.x;
-		float tempY = transform.position.y;
-		if(transform.position.x < 0)
-		{
-		    tempX = 0;
-		} 
-		else if(transform.position.x > hub.MAX_X)
-		{
-			tempX = hub.MAX_X;
-		}
-		if (transform.position.y < 0)
-		{
-			tempY = 0;
-		}
-		else if (transform.position.y > hub.MAX_Y)
-		{
-			tempY = hub.MAX_Y;
-		}
-		MoveToWorldSpace(new Vector3(tempX, tempY, 0));
-	}
-
-	//limit the cursor to only move over movement tiles
-	bool LimitToMoveTiles()
-	{
-		bool returnable = false;
-		int tempX = realRound(transform.position.x/HUB.SPACER);
-		int tempY = realRound(transform.position.y/HUB.SPACER);
-
-		//may want to research more for a better find function here
-		GameObject[] moveTiles = GameObject.FindGameObjectsWithTag("MoveTile");
-
-		//see if there is a move tile beneath you
-		for(int i = 0; i < moveTiles.Length; i++)
-		{
-			if(realRound(moveTiles[i].transform.position.x/HUB.SPACER) == tempX && realRound(moveTiles[i].transform.position.y/HUB.SPACER) == tempY)
-			{
-				returnable = true;
-			}
-		}
-		return returnable;
-	}
-
-	//"pos" here is in grid space. 
-	public void MoveToGridSpace(Vector2 pos)
-	{
-	
-		transform.position = new Vector2(pos.x * HUB.SPACER, pos.y * HUB.SPACER);
-		//move the selected character with the cursor
-		if (selectedCharacter != null && selectedCharacter.gameObject.transform.position != transform.position)
-		{
-			hub.moveCharacter(selectedCharacter, transform.position);
-		}
-		isOnCharacter();
-	}
-
-	public void MoveToWorldSpace(Vector2 pos)
-	{
-	
-		transform.position = pos;
-		//move the selected character with the cursor
-		if (selectedCharacter != null && selectedCharacter.gameObject.transform.position != transform.position)
-		{
-			hub.moveCharacter(selectedCharacter, transform.position);
-		}
-		isOnCharacter();
 	}
 
 	//returns the in-grid x,y cooridnate of the cursor
@@ -400,5 +297,25 @@ public class Cursor : AbstractScript {
 	public int getIntY()
 	{
 		return realRound(transform.position.y / HUB.SPACER);
+	}
+	public void setOnMapTile(MapTile mt)
+	{
+		onMapTile = mt;
+		if (selectedCharacter != null)
+		{
+			if (selectedCharacter.onMapTile != null)
+			{ 
+				selectedCharacter.onMapTile.setCharacterOnTile(null);
+			}
+			selectedCharacter.onMapTile = mt;
+			mt.setCharacterOnTile(selectedCharacter);
+			selectedCharacter.transform.position = mt.transform.position;
+		}
+		transform.position = mt.transform.position;
+		isOnCharacter();
+	}
+	public MapTile getOnMapTile()
+	{
+		return onMapTile;
 	}
 }

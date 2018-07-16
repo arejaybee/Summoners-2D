@@ -66,8 +66,8 @@ public class SummonMenu : AbstractScript
 	void fillStatPortion()
 	{
 		GameObject.Find("SelectedStats").GetComponent<TextMesh>().text = "  ATK: "+summonOptions[index].c.attk+"\t\tRNG: "+ summonOptions[index].c.attkRange+"\n  DEF: "+ summonOptions[index].c .defense+ "\t\tMOV:"+ summonOptions[index].c.move+ "\n\t\t\tZEAL: "+summonOptions[index].c.zeal+ "\n"+summonOptions[index].c.description+"\n\t\t\tCost: "+ summonOptions[index].c.cost+ "\n\t\t\tMana: "+Turns.getCurrentSummoner().mana;
-		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = selectedChar.name;
-		GameObject.Find("StatDisplay").transform.Find("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
+		GameObject.Find("SelectedName").GetComponent<TextMesh>().text = summonOptions[index].c.name;
+		GameObject.Find("StatDisplay").transform.Find("Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(summonOptions[index].c.iconPath);
 	}
 
 	/*
@@ -196,17 +196,18 @@ public class SummonMenu : AbstractScript
 		//make tiles showing where they can summon
 		hub.MakeTiles("SummonTile");
 
-		hub.CURSOR.selectedCharacter = null;
-		//put that character onto the cursor
-		hub.CURSOR.MoveToGridSpace((Vector2)hub.summonPositions[0]);
-		Character chara = hub.makeCharacter(c.name, hub.CURSOR.transform.position);
-
 		//tell the cursor to stop caring about the summoner (if it did)
 		if (hub.CURSOR.selectedCharacter != null)
 		{
-			hub.CURSOR.selectedCharacter.canMove = false;
+			hub.CURSOR.selectedCharacter.setCanMove(false);
 			hub.CURSOR.selectedCharacter = null;
 		}
+
+		//put that character onto the cursor
+		hub.CURSOR.setOnMapTile((MapTile)hub.summonPositions[0]);
+
+		Character chara = hub.makeCharacter(c.name, hub.CURSOR.getOnMapTile());
+
 		//assign the cursor to the character
 		hub.CURSOR.canSelect = false;
 		hub.CURSOR.summoning = true;
@@ -218,8 +219,6 @@ public class SummonMenu : AbstractScript
 		hub.CAMERA_CONTROLLER.toggleChildren(true);
 		hub.CURSOR.confirmFromMoveMenu();
 		hub.MOVE_MENU_CONTROLLER.removeMenu();
-		
-
 	}
 
 	//sorts both the 'canAfford' and 'cannotAfford' lists in alpha order
