@@ -36,7 +36,6 @@ public class HUB : MonoBehaviour{
 	public ArrayList mapTilePos;
 
 	public ArrayList characters; //an arraylist of all of the characters
-	public ArrayList characterPositions;//world space coordinates
 	public ArrayList enemyPositions;//grid space coordinates
 	public ArrayList summonPositions;//gird space coordinates
 	public ArrayList moveTilePositions;//grid space coordinates
@@ -58,10 +57,9 @@ public class HUB : MonoBehaviour{
 			LAST_TIME_RIGHT = Time.time;
 			characters = new ArrayList();
 
-
-		characterPositions = new ArrayList();
 			enemyPositions = new ArrayList();
 			summonPositions = new ArrayList();
+			moveTilePositions = new ArrayList();
 			charsInRange = new ArrayList();
 			players = new Player[2];
 			gameOver = false;
@@ -70,7 +68,7 @@ public class HUB : MonoBehaviour{
 			for (int i = 0; i < players.Length; i++)
 			{
 				players[i] = new Player(i + 1);
-				Summoner summoner = makeSummoner(i + 1, new Vector2(0,0));
+				Summoner summoner = makeSummoner(i + 1);
 				players[i].setSummoner(summoner.GetComponent<Summoner>());
 				players[i].setGamePad(new Gamepad("keyboard"));
 			}
@@ -119,51 +117,43 @@ public class HUB : MonoBehaviour{
 	// Update is called once per frame
 	void Update ()
 	{
-		characterPositions.Clear();
 		characters.Clear();
 		Character[] chars = GameObject.FindObjectsOfType<Character>();
 		for (int i = 0; i < chars.Length; i++)
 		{
 			characters.Add((Character)chars[i]);
-			characterPositions.Add(roundPosition(chars[i].transform.position));
 		}
 	}
 
-	public void moveCharacter(Character c, Vector2 pos)
+	public void moveCharacter(Character c, MapTile mt)
 	{
-		for(int i =0; i < characters.Count; i++)
+		if (c.onMapTile != null && c.onMapTile.getCharacterOnTile() != null)
 		{
-			if(c.Equals(characters[i]))
-			{
-				characterPositions[i] = pos;
-			}
+			c.onMapTile.setCharacterOnTile(null);
 		}
-		c.transform.position = pos;
+		mt.setCharacterOnTile(c);
+		c.onMapTile = mt;
+		c.transform.position = mt.transform.position;
 	}
 
-	public Character makeCharacter(string name, Vector2 pos)
+	public Character makeCharacter(string name, MapTile mt)
 	{
 		GameObject characterObj = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Units/" + name)));
-		characterObj.transform.position = pos;
+		characterObj.transform.position = mt.transform.position;
 		Character c = characterObj.GetComponent<Character>();
 		c.CreateCharacter();
 		characters.Add(c);
-		characterPositions.Add(pos);
 		return c;
 	}
 
-	public Summoner makeSummoner(int playerNum, Vector2 pos)
+	public Summoner makeSummoner(int playerNum)
 	{
 		GameObject summoner = ((GameObject)Instantiate(Resources.Load("Prefab/Characters/Summoner")));
 		Summoner s = summoner.GetComponent<Summoner>();
 		s.setPlayerNum(playerNum);
 		characters.Add(s);
-		characterPositions.Add(pos);
-
 		return s;
 	}
-
-
 
 	public bool currentSummonerCanSummon()
 	{
@@ -173,25 +163,10 @@ public class HUB : MonoBehaviour{
 			return false;
 		}
 		//must be places in range to summon to.
-		findPlacesToSummon(summonPositions, Turns.getCurrentSummoner().summonRange, Turns.getCurrentSummoner().getIntX(), Turns.getCurrentSummoner().getIntY());
+		findPlacesToSummon(summonPositions, Turns.getCurrentSummoner().summonRange, Turns.getCurrentSummoner().onMapTile);
 		if (summonPositions.Count > 0)
 		{
 			return true;
-		}
-		return false;
-	}
-
-	//for some reason the contains function does not work as it should, so I wrote my own
-	protected bool listHasVector(ArrayList list, Vector2 pos)
-	{
-		pos = roundPosition(pos);
-		for (int i = 0; i < characterPositions.Count; i++)
-		{
-			//print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
-			if ((Vector2)characterPositions[i] == pos)
-			{
-				return true;
-			}
 		}
 		return false;
 	}
@@ -220,13 +195,13 @@ public class HUB : MonoBehaviour{
 			switch (name)
 			{
 				case ("MoveTile"):
-					obj.transform.position = gridToWorld((Vector2)moveTilePositions[i]);
+					obj.transform.position = ((MapTile)moveTilePositions[i]).transform.position;
 					break;
 				case ("EnemyTile"):
-					obj.transform.position = gridToWorld((Vector2)enemyPositions[i]);
+					obj.transform.position = ((MapTile)enemyPositions[i]).transform.position;
 					break;
 				case ("SummonTile"):
-					obj.transform.position = gridToWorld((Vector2)summonPositions[i]);
+					obj.transform.position = ((MapTile)summonPositions[i]).transform.position;
 					break;
 			}
 		}
@@ -269,156 +244,68 @@ public class HUB : MonoBehaviour{
 		return (count == players.Length - 1);
 	}
 
-	//given a position, find a character that is at the position
-	//where pos is in world space
-	public Character findCharacterAt(Vector2 pos)
-	{
-		pos = roundPosition(pos);
-		for (int i = 0; i < characterPositions.Count; i++)
-		{
-			//print("There is a " + ((Character)characters[i]).name + " at " + (Vector2)characterPositions[i]);
-			if ((Vector2)characterPositions[i] == pos)
-			{
-				return ((Character)characters[i]);
-			}
-		}
-		return null;
-	}
-
-	/*
-	 * Given a character, returns all characters that share a position with it (this should be 0)
-	 */
-	public ArrayList findCharactersOn(Character c)
-	{
-		ArrayList charactersToReturn = new ArrayList();
-		for (int i = 0; i < characters.Count; i++)
-		{
-			//if the is a character that isnt c
-			if ((Character)characters[i] != c)
-			{
-				//if it occupies the same place as c
-				if ((Vector2)characterPositions[i] == roundPosition(new Vector2(c.getIntX(), c.getIntY())))
-				{
-					charactersToReturn.Add((Character)characters[i]);
-				}
-			}
-		}
-		return charactersToReturn;
-	}
-
-	//if there are any enemies within the range of a character, return true
-	public bool enemyInRange(Character c)
-	{
-		bool flag = false;
-		ArrayList mapPositions = new ArrayList();
-
-		//fill mapPositions with positions of all characters within the range
-		findCharacters(mapPositions, c.attkRange + 1, c.getIntX(), c.getIntY(), c.playerNumber);
-
-		//fills in the enemyPositions global variable when used. also sets a flag to let the "attack" option show
-		for (int i = 0; i < mapPositions.Count; i++)
-		{
-			if (findCharactersWithDifferentPlayerNumber(((Vector2)mapPositions[i]), c))
-			{
-				flag = true;
-			}
-		}
-		return flag;
-	}
-
-	//if there are any characters within the range of a character, return true
-	//This is used for "speak" so I excluded Summoner explicitly
 	public ArrayList charactersInRange(Character c)
 	{
-		ArrayList mapPositions = new ArrayList();
-		findCharacters(mapPositions, c.attkRange + 1, c.getIntX(), c.getIntY(), c.playerNumber);
-
-		charsInRange.Clear();
-		for (int i = 0; i < characters.Count; i++)
-		{
-			Character chara = (Character)characters[i];
-
-			//if the character isnt c, isnt a summoner, and was within the range of findCharacters
-			if (chara != c && chara.name != "Summoner" && mapPositions.Contains(new Vector2(chara.getIntX(), chara.getIntY())))
-			{
-				charsInRange.Add(chara);
-			}
-		}
-		return charsInRange;
+		ArrayList inRangeCharacters = new ArrayList();
+		MapTile mt = c.onMapTile;
+		findCharactersInRange(mt, c.attkRange, inRangeCharacters);
+		inRangeCharacters.Remove(c);
+		return inRangeCharacters;
 	}
 
-	//finds characters at a position and checks if they share a player num with a given palyer number
-	public bool findCharactersWithDifferentPlayerNumber(Vector2 pos, Character c)
+	public bool enemyInRange(Character c)
 	{
+		ArrayList charsInRange = charactersInRange(c);
+		enemyPositions.Clear();
 		bool flag = false;
-		//find the character at the given position
-		Character chara = findCharacterAt(gridToWorld(pos));
-
-		//if there was a character
-		if (chara != null)
+		print("Enemies in range: "+charsInRange.Count);
+		for(int i = 0; i < charsInRange.Count; i++)
 		{
-			//see if its an enemy
-			if (chara.playerNumber != c.playerNumber)
+			if (!((Character)charsInRange[i]).isAllyTo(c))
 			{
+				enemyPositions.Add(((Character)charsInRange[i]).onMapTile);
 				flag = true;
-				enemyPositions.Add(new Vector2(chara.getIntX(), chara.getIntY()));
 			}
 		}
 		return flag;
 	}
 
-	//recursively makes the tiles that show a user where they can move
-	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
-	//x and y here are in grid space
-	public void findCharacters(ArrayList characterPos, float range, int x, int y, float playerNumber)
+	public void findCharactersInRange(MapTile mt, int range, ArrayList inRangeCharacters)
 	{
-		Vector2 pos = new Vector2(x, y);
-
-		//stop when you cant move
-		if (range <= 0)
+		if(range < 0 || mt == null)
+		{
 			return;
-
-		//dont overlap positions
-		if (!characterPos.Contains(pos))
-		{
-			//iif so, add this postion for spawning
-			characterPos.Add(pos);
 		}
-
-
-		//move up,left,right,down
-		if (y + 1 <= realRound(MAX_Y / SPACER))
+		if(mt.getCharacterOnTile() != null && !inRangeCharacters.Contains(mt.getCharacterOnTile()))
 		{
-			findCharacters(characterPos, range - 1, x, y + 1, playerNumber);
+			inRangeCharacters.Add(mt.getCharacterOnTile());
 		}
-		if (x - 1 >= 0)
-		{
-			findCharacters(characterPos, range - 1, x - 1, y, playerNumber);
-		}
-		if (x + 1 <= realRound(MAX_X / SPACER))
-		{
-			findCharacters(characterPos, range - 1, x + 1, y, playerNumber);
-		}
-		if (y - 1 >= 0)
-		{
-			findCharacters(characterPos, range - 1, x, y - 1, playerNumber);
-		}
+		if(mt.getNorthTile() != null)
+			findCharactersInRange(mt.getNorthTile(), range - 1, inRangeCharacters);
+		if (mt.getEastTile() != null)
+			findCharactersInRange(mt.getEastTile(), range - 1, inRangeCharacters);
+		if (mt.getSouthTile() != null)
+			findCharactersInRange(mt.getSouthTile(), range - 1, inRangeCharacters);
+		if (mt.getWestTile() != null)
+			findCharactersInRange(mt.getWestTile(), range - 1, inRangeCharacters);
 	}
 
+
+	public void FindMoveTiles(int move, MapTile mt, Character charToMove)
+	{
+		moveTilePositions.Clear();
+		FindMoveTile(move, mt, charToMove, false);
+	}
 	//recursively makes the tiles that show a user where they can move
 	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
 	//x and y are in grid space
-	public void FindMoveTile(int move, int x, int y, Character charToMove, bool hasMoved)
+	public void FindMoveTile(int move, MapTile mt, Character charToMove,bool hasMoved)
 	{
-		Vector2 pos = new Vector2(x, y);
-		//find the map tile at this spot
-		int index = mapTilePos.IndexOf(pos);
-
 		//calculate cost to move their
 		int cost;
 		if (hasMoved)
 		{
-			cost = ((GameObject)mapTiles[index]).GetComponent<MapTile>().moveCost;
+			cost = mt.moveCost;
 		}
 		//first step is free (Its the spot the character is already on)
 		else
@@ -429,83 +316,62 @@ public class HUB : MonoBehaviour{
 		//stop when you cant move
 		if (move - cost < 0)
 			return;
-
-		Vector2 worldSpaceLoc = (gridToWorld(pos));
+		
 
 		//if there is a character on this square that is not your ally, you cannotmove there.
-		if (hasMoved && characterPositions.Contains(worldSpaceLoc) && !findCharacterAt(worldSpaceLoc).isAllyTo(charToMove))
+		if (hasMoved && mt.getCharacterOnTile() != null && mt.getCharacterOnTile().isAllyTo(charToMove))
 		{
 			return;
 		}
 
-
-
 		//dont overlap positions
-		if (!moveTilePositions.Contains(pos))
+		if (!moveTilePositions.Contains(mt))
 		{
-			if (!hasMoved || (hasMoved && !characterPositions.Contains(worldSpaceLoc)))
-			{
-				//add this postion for spawning
-				moveTilePositions.Add(pos);
-			}
+			//add this postion for spawning
+			moveTilePositions.Add(mt);
 		}
 
-		//move up,left,right,down
-		if (y + 1 <= realRound(MAX_Y / SPACER))
-		{
-
-			FindMoveTile(move - cost, x, y + 1, charToMove, true);
-		}
-		if (x - 1 >= 0)
-		{
-			FindMoveTile(move - cost, x - 1, y, charToMove, true);
-		}
-		if (x + 1 <= realRound(MAX_X / SPACER))
-		{
-			FindMoveTile(move - cost, x + 1, y, charToMove, true);
-		}
-		if (y - 1 >= 0)
-		{
-			FindMoveTile(move - cost, x, y - 1, charToMove, true);
-		}
+		if(mt.getNorthTile() != null)
+			FindMoveTile(move - cost, mt.getNorthTile(), charToMove, true);
+		if (mt.getEastTile() != null)
+			FindMoveTile(move - cost, mt.getEastTile(), charToMove, true);
+		if (mt.getSouthTile() != null)
+			FindMoveTile(move - cost, mt.getSouthTile(), charToMove, true);
+		if (mt.getWestTile() != null)
+			FindMoveTile(move - cost, mt.getWestTile(), charToMove, true);
 	}
-
-	//recursively makes the tiles that show a user where they can move
-	//THIS FUNCTION IS A MESS BUT IT FINALLY WORKS AND IS PRETTY QUICK!
-	//x and y are in grid space here
-	public void findPlacesToSummon(ArrayList summonPos, float range, int x, int y)
+	
+	public void findPlacesToSummon(ArrayList summonPos, float range, MapTile mt)
 	{
-		Vector2 pos = new Vector2(x, y);
 		//stop when you cant move
 		if (range < 0)
 			return;
-
-		//print("Can we put a tile down at: " + x + " , " + y + " ? With a range of: "+range);
-		//dont overlap positions and only add if the characterPossitinon array doesnt have this position
-		if (!summonPos.Contains(pos) && !characterPositions.Contains(gridToWorld(pos)))
+		
+		//dont overlap positions and only add if the tile has no character on it
+		if (!summonPos.Contains(mt) && mt.getCharacterOnTile() == null)
 		{
 			//if so, add this postion for spawning
-			summonPos.Add(pos);
+			summonPos.Add(mt);
 		}
-
 
 		//move up,left,right,down
-		if (y + 1 <= realRound(MAX_Y / SPACER))
+		if (mt.getNorthTile() != null)
 		{
-			findPlacesToSummon(summonPos, range - 1, x, y + 1);
+			findPlacesToSummon(summonPos, range - 1, mt.getNorthTile());
 		}
-		if (x - 1 >= 0)
+		if (mt.getEastTile() != null)
 		{
-			findPlacesToSummon(summonPos, range - 1, x - 1, y);
+			findPlacesToSummon(summonPos, range - 1, mt.getEastTile());
 		}
-		if (x + 1 <= realRound(MAX_X / SPACER))
+		if (mt.getSouthTile() != null)
 		{
-			findPlacesToSummon(summonPos, range - 1, x + 1, y);
+			findPlacesToSummon(summonPos, range - 1, mt.getSouthTile());
 		}
-		if (y - 1 >= 0)
+		if (mt.getWestTile() != null)
 		{
-			findPlacesToSummon(summonPos, range - 1, x, y - 1);
+			findPlacesToSummon(summonPos, range - 1, mt.getWestTile());
 		}
+
 	}
 
 	//change grid coordinates to world coordinates

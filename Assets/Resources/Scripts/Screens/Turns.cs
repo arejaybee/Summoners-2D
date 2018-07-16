@@ -64,8 +64,8 @@ public class Turns : AbstractScript
 				}
 			}
 			getCurrentSummoner().addMana(5);//you get 5 mana every turn! (subject to change)
-			hub.CURSOR.MoveToWorldSpace(getCurrentSummoner().transform.position);//put the cursor over the in-turn summoner
-																					//say whose turn it is
+			hub.CURSOR.setOnMapTile(getCurrentSummoner().onMapTile);
+																			
 			turnDisplay.GetComponent<SpriteRenderer>().sprite = Resources.Load("Prefab/Turns/P" + getCurrentPlayerTurn() + "Turn", typeof(Sprite)) as Sprite;
 		}
 	}

@@ -12,8 +12,20 @@ public class TopBar : MonoBehaviour
 		topBar = GameObject.Find("TopBar"); //cannot get the gameobject by using "this" for some reason...
 	}
 
+	private void Update()
+	{
+		if (selectedChar != null)
+		{
+			FillTopInfo();
+		}
+	}
+
 	public void setTopBarActive(bool flag, Character c)
 	{
+		if (c == null)
+		{
+			flag = false;
+		}
 		topBar.SetActive(flag);
 		selectedChar = c;
 		if (flag)
@@ -47,7 +59,6 @@ public class TopBar : MonoBehaviour
 
 		//icon
 		icon.GetComponent<SpriteRenderer>().sprite = Resources.Load<UnityEngine.Sprite>(selectedChar.iconPath);
-		//print("Attempting to load sprite from: " + selectedChar.iconPath);
 
 		//math for HPbar
 		//So as far as I can tell, -5 should be a constant as the length/position of the health bar. This may change if I can find out where the number really comes from.

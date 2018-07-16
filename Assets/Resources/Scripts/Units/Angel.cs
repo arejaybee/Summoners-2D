@@ -11,7 +11,7 @@ public class Angel : Character
 		base.Start();
 		maxHp = 10;
 		hp = 10;
-		move = 10;
+		move = 9;
 		attkRange = 10;
 		attk = 10;
 		defense = 10;

@@ -80,9 +80,6 @@ public class MoveMenuController : AbstractScript
 				//hub.cursor.confirmFromMoveMenu();
 				//removeMenu();
 				break;
-			case ("Speak"):
-				beginSpeaking();
-				break;
 			case ("Summon"):
 				//removeMenu();
 				//move camera to the summon menu (also make a summon menu lol)
@@ -148,19 +145,6 @@ public class MoveMenuController : AbstractScript
 		//set cursor flag to know it needs to attack
 		hub.CURSOR.attacking = true;
 	    Cursor.cursorCanMove = true;
-		removeMenu();
-	}
-	public void beginSpeaking()
-	{
-		for(int i = 0; i < hub.charsInRange.Count; i++)
-		{
-			if(((Character)hub.charsInRange[i]).name != "Summoner")
-			{
-				hub.CURSOR.selectedCharacter.speak((Character)hub.charsInRange[i]);
-			}
-		}
-		Cursor.cursorCanMove = true;
-		hub.CURSOR.confirmFromMoveMenu();
 		removeMenu();
 	}
 }

@@ -76,10 +76,37 @@ public class MapGenerator : AbstractScript
 				newMapTiles[i, j] = m.GetComponent<MapTile>();
 			}
 		}
+		setAdjacentTiles();
 		//add summoners
-		hub.moveCharacter(sum1, new Vector2(0, HUB.SPACER * (int)(n.Length / 2)));
-		hub.moveCharacter(sum2, new Vector2(HUB.SPACER * (int)(n[0].Length - 1), HUB.SPACER * (int)(n.Length / 2)));
+		hub.moveCharacter(sum1, newMapTiles[newMapTiles.GetLength(0) / 2, 0]);
+		hub.moveCharacter(sum2, newMapTiles[newMapTiles.GetLength(0) / 2, newMapTiles.GetLength(1)-1]);
+		
+		hub.CURSOR.setOnMapTile(newMapTiles[newMapTiles.GetLength(0)/2,0]);
+	}
 
-		hub.CURSOR.MoveToWorldSpace(sum1.transform.position);
+	void setAdjacentTiles()
+	{
+		for(int i = 0; i < newMapTiles.GetLength(0); i++)
+		{
+			for(int j = 0; j < newMapTiles.GetLength(1); j++)
+			{
+				if(i > 0)
+				{
+					newMapTiles[i,j].setSouthTile(newMapTiles[i-1,j]);
+				}
+				if (i < newMapTiles.GetLength(0) - 1)
+				{
+					newMapTiles[i, j].setNorthTile(newMapTiles[i + 1, j]);
+				}
+				if (j > 0)
+				{
+					newMapTiles[i, j].setWestTile(newMapTiles[i, j - 1]);
+				}
+				if (j < newMapTiles.GetLength(1) - 1)
+				{
+					newMapTiles[i, j].setEastTile(newMapTiles[i, j + 1]);
+				}
+			}
+		}
 	}
 }

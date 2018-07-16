@@ -29,6 +29,7 @@ public class Character : AbstractScript
 	protected bool piercing;
 	public string iconPath;
 	public int faction;
+	public MapTile onMapTile = null;
 
 	//literally just to size/space based on cursor size
 	private float spacer;
