@@ -9,14 +9,26 @@ public class SettingsMenu : MonoBehaviour {
 	private Text mvDisplay;
 	private AudioSource music;
 	public GameObject defaultButton;
-
+	private GameObject lastButton;
 	// Use this for initialization
 	void Start () {
 		music = Component.FindObjectOfType<AudioSource>();
-		mvDisplay = transform.Find("MusicText").GetComponent<Text>();
-		musicVolume = transform.Find("MusicSlider").GetComponent<Slider>();
+		mvDisplay = GameObject.Find("MusicText").GetComponent<Text>();
+		musicVolume = GameObject.Find("MusicSlider").GetComponent<Slider>();
 		musicVolume.onValueChanged.AddListener(MusicChange);
 		musicVolume.value = (int)(Music.musicVolume / 5);
+	}
+
+	void Update()
+	{
+		if (EventSystem.current.currentSelectedGameObject.Equals(musicVolume.gameObject))
+		{
+			mvDisplay.color = Color.gray;
+		}
+		else
+		{
+			mvDisplay.color = Color.white;
+		}
 	}
 
 	private void MusicChange(float val)
@@ -28,6 +40,12 @@ public class SettingsMenu : MonoBehaviour {
 
 	public void OnOpen()
 	{
+		lastButton = EventSystem.current.currentSelectedGameObject;
 		EventSystem.current.SetSelectedGameObject(defaultButton);
+	}
+
+	public void OnClose()
+	{
+		EventSystem.current.SetSelectedGameObject(lastButton);
 	}
 }
