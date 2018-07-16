@@ -23,14 +23,14 @@ public class PauseMenuController : MonoBehaviour {
 		}
 	}
 
-	private void Resume()
+	public void Resume()
 	{
 		pauseMenuUI.SetActive(false);
 		Time.timeScale = 1f;
 		isPaused = false;
 	}
 
-	private void Pause()
+	public void Pause()
 	{
 		pauseMenuUI.SetActive(true);
 		EventSystem.current.SetSelectedGameObject(defaultButton);

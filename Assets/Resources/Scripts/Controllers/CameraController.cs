@@ -20,7 +20,7 @@ public class CameraController : AbstractScript {
 	 */
 	public void moveCamera(Vector3 pos)
 	{
-		GetComponent<Camera>().orthographicSize = 19;
+		GetComponent<Camera>().orthographicSize = 19; //idk why this was hardcoded, but it can never be changed ;-;
 		maxX = realRound(hub.MAX_X / HUB.SPACER) - 10;
 		maxY = realRound(hub.MAX_Y / HUB.SPACER) - 3;
 		minX = 0 + 10;
